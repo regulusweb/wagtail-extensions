@@ -67,6 +67,7 @@ class DepartmentBlock(blocks.StructBlock):
     name = blocks.CharBlock(required=False)
     phone = PhoneBlock(required=False)
     email = blocks.EmailBlock(required=False)
+    primary = blocks.BooleanBlock(required=False, default=False)
 
     def clean(self, value):
         phone = value.get('phone')
