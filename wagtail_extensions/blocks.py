@@ -44,6 +44,9 @@ class AddressBlock(blocks.StructBlock):
 
     lines = blocks.ListBlock(blocks.CharBlock(label="Line", required=False))
 
+    class Meta:
+        template = 'wagtail_extensions/blocks/address.html'
+
 
 class PhoneBlock(blocks.FieldBlock):
 
