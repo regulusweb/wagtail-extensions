@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
 from phonenumber_field.formfields import PhoneNumberField
+from phonenumber_field.phonenumber import PhoneNumber
 from wagtail.wagtailcore import blocks
 from wagtailgeowidget.blocks import GeoBlock
 
@@ -56,6 +57,9 @@ class PhoneBlock(blocks.FieldBlock):
 
     def get_prep_value(self, value):
         return str(value)
+
+    def to_python(self, value):
+        return PhoneNumber.from_string(value)
 
 
 class DepartmentBlock(blocks.StructBlock):

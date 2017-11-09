@@ -88,3 +88,9 @@ def test_phone_block_get_prep_value():
     number = PhoneNumber.from_string('+447528712345')
     number_str = phone.get_prep_value(number)
     assert number_str == '+447528712345'
+
+
+def test_phone_block_to_python():
+    phone = PhoneBlock()
+    number = phone.to_python('+447528712345')
+    assert number == PhoneNumber.from_string('+447528712345')
