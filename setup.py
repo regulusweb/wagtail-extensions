@@ -25,6 +25,10 @@ setup(
     url='https://regulusweb.com/',
     author='Craig Loftus',
     author_email='craig@regulusweb.com',
+    install_requires=[
+        'django-phonenumber-field',
+        'wagtailgeowidget',
+    ],
     extras_require={
         'test': test_requires,
     },
