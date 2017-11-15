@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
+from phonenumber_field import phonenumber
 from phonenumber_field.formfields import PhoneNumberField
-from phonenumber_field.phonenumber import PhoneNumber
 from wagtail.wagtailcore import blocks
 from wagtailgeowidget.blocks import GeoBlock
 
@@ -59,7 +59,7 @@ class PhoneBlock(blocks.FieldBlock):
         return str(value)
 
     def to_python(self, value):
-        return PhoneNumber.from_string(value)
+        return phonenumber.to_python(value)
 
 
 class DepartmentBlock(blocks.StructBlock):
@@ -70,9 +70,9 @@ class DepartmentBlock(blocks.StructBlock):
     primary = blocks.BooleanBlock(required=False, default=False)
 
     def clean(self, value):
-        phone = value.get('phone')
+        phones = [p for p in value.get('phones', []) if p != '']
         email = value.get('email')
-        if not phone and not email:
+        if not phones and not email:
             errors = {
                 'phone': ErrorList([
                     ValidationError('Either a phone or email must be defined'),
@@ -80,6 +80,11 @@ class DepartmentBlock(blocks.StructBlock):
             }
             raise ValidationError("There is a problem with this department", params=errors)
         return super().clean(value)
+
+    def to_python(self, value):
+        value = super().to_python(value)
+        value['non_empty_phones'] = [p for p in value.get('phones') if p != '']
+        return value
 
 
 class LocationBlock(blocks.StructBlock):

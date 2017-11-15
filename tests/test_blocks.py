@@ -16,6 +16,17 @@ def test_department_block_clean_valid_with_both():
     department.clean({'name':'Test', 'email':'foo@foo.com', 'phones': ['+447528712345']})
 
 
+def test_department_block_to_python_empty():
+    department = DepartmentBlock()
+    department.to_python({})
+
+
+def test_department_block_to_python_strip_empty_phonenumbers():
+    department = DepartmentBlock()
+    value = department.to_python({'phones': ['', '+447528712345', '']})
+    assert value['non_empty_phones'] == ['+447528712345']
+
+
 @pytest.mark.django_db
 def test_link_block_clean_just_page():
     link = LinkBlock()
@@ -94,3 +105,8 @@ def test_phone_block_to_python():
     phone = PhoneBlock()
     number = phone.to_python('+447528712345')
     assert number == PhoneNumber.from_string('+447528712345')
+
+
+def test_phone_block_to_python_empty():
+    phone = PhoneBlock()
+    assert phone.to_python('') == ''
