@@ -13,7 +13,7 @@ def test_department_block_clean_invalid():
 
 def test_department_block_clean_valid_with_both():
     department = DepartmentBlock()
-    department.clean({'name':'Test', 'email':'foo@foo.com', 'phone':'+447528712345'})
+    department.clean({'name':'Test', 'email':'foo@foo.com', 'phones': ['+447528712345']})
 
 
 @pytest.mark.django_db

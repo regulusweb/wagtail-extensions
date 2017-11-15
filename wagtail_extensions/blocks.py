@@ -65,7 +65,7 @@ class PhoneBlock(blocks.FieldBlock):
 class DepartmentBlock(blocks.StructBlock):
 
     name = blocks.CharBlock(required=False)
-    phone = PhoneBlock(required=False)
+    phones = blocks.ListBlock(PhoneBlock(required=False))
     email = blocks.EmailBlock(required=False)
     primary = blocks.BooleanBlock(required=False, default=False)
 

@@ -15,7 +15,6 @@ def contact_setting():
 
 @pytest.mark.django_db
 def test_contact_details_primary_location_empty(contact_setting):
-    contact_setting.locations = []
     assert contact_setting.primary_location == None
 
 
@@ -32,12 +31,6 @@ def test_contact_details_primary_location_found(contact_setting):
 
 @pytest.mark.django_db
 def test_contact_details_primary_department_empty(contact_setting):
-    contact_setting.locations = [
-        ('location', {
-            'primary': True,
-            'departments': [],
-        }),
-    ]
     assert contact_setting.primary_department == None
 
 
@@ -55,3 +48,21 @@ def test_contact_details_primary_department_found(contact_setting):
         }),
     ]
     assert contact_setting.primary_department == match
+
+
+@pytest.mark.django_db
+def test_contact_details_primary_phone_empty(contact_setting):
+    assert contact_setting.primary_phone == None
+
+
+@pytest.mark.django_db
+def test_contact_details_primary_phone_found(contact_setting):
+    contact_setting.locations = [
+        ('location', {
+            'primary': True,
+            'departments': [
+                {'primary': True, 'phones': ['+447528712345', '+447528712346', '+447528712347']},
+            ],
+        })
+    ]
+    assert contact_setting.primary_phone == '+447528712345'

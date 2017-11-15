@@ -39,5 +39,18 @@ class ContactDetailsSetting(BaseSetting):
 
     @property
     def primary_department(self):
-        departments = self.primary_location.value.get('departments', [])
-        return utils.first_true(departments, lambda x: x.get('primary') == True)
+        location = self.primary_location
+        if location:
+            departments = location.value.get('departments', [])
+            return utils.first_true(departments, lambda x: x.get('primary') == True)
+        else:
+            return None
+
+    @property
+    def primary_phone(self):
+        department = self.primary_department
+        if department:
+            phones = self.primary_department.get('phones', [])
+            return utils.nth(phones, 0)
+        else:
+            return None
