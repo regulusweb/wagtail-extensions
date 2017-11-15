@@ -27,6 +27,7 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 
 INSTALLED_APPS = [
     'wagtail_extensions',
+    'tests.testproject.testapp.apps.TestAppConfig',
 
     'wagtail.wagtailforms',
     'wagtail.wagtailredirects',

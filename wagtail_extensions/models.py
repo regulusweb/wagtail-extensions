@@ -3,6 +3,7 @@ from wagtail.wagtailadmin.edit_handlers import StreamFieldPanel
 from wagtail.wagtailcore import blocks, fields
 
 from . import blocks as extension_blocks
+from . import utils
 
 
 class LinksSetting(BaseSetting):
@@ -31,3 +32,12 @@ class ContactDetailsSetting(BaseSetting):
     panels = (
         StreamFieldPanel('locations'),
     )
+
+    @property
+    def primary_location(self):
+        return utils.first_true(self.locations, lambda x: x.value.get('primary') == True)
+
+    @property
+    def primary_department(self):
+        departments = self.primary_location.value.get('departments', [])
+        return utils.first_true(departments, lambda x: x.get('primary') == True)
