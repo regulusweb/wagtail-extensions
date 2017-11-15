@@ -1,7 +1,19 @@
 from django.core.exceptions import ValidationError
+from phonenumber_field.phonenumber import PhoneNumber
 import pytest
 from wagtail.wagtailcore.models import Page
-from wagtail_extensions.blocks import LinkBlock
+from wagtail_extensions.blocks import DepartmentBlock, LinkBlock, PhoneBlock
+
+
+def test_department_block_clean_invalid():
+    department = DepartmentBlock()
+    with pytest.raises(ValidationError):
+        department.clean({})
+
+
+def test_department_block_clean_valid_with_both():
+    department = DepartmentBlock()
+    department.clean({'name':'Test', 'email':'foo@foo.com', 'phones': ['+447528712345']})
 
 
 @pytest.mark.django_db
@@ -69,3 +81,16 @@ def test_link_block_get_context_with_url():
     link = LinkBlock()
     ctx = link.get_context({'url': 'some url'})
     assert ctx['has_url'] == True
+
+
+def test_phone_block_get_prep_value():
+    phone = PhoneBlock()
+    number = PhoneNumber.from_string('+447528712345')
+    number_str = phone.get_prep_value(number)
+    assert number_str == '+447528712345'
+
+
+def test_phone_block_to_python():
+    phone = PhoneBlock()
+    number = phone.to_python('+447528712345')
+    assert number == PhoneNumber.from_string('+447528712345')
