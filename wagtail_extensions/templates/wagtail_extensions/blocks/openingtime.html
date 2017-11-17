@@ -1,0 +1,4 @@
+<div class="opening-time">
+    <span class="opening-time-label">{% firstof value.label value.date next_date|date:"l" %}</span>
+    <span class="opening-time-times">{% if value.closed %}Closed{% else %}{{ value.start|time:"h:i A" }} - {{ value.end|time:"h:i A" }}{% endif %}</span>
+</div>

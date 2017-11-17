@@ -1,3 +1,8 @@
+import calendar
+from collections import defaultdict
+import datetime
+
+from dateutils import relativedelta
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
 from phonenumber_field import phonenumber
@@ -93,10 +98,76 @@ class DepartmentBlock(blocks.StructBlock):
         return super().clean(value)
 
 
+class OpeningTimeBlock(blocks.StructBlock):
+    """
+    A semi-structured opening times block.
+
+    Period is left as a free text input to allow for
+    """
+    PUBLIC = 7
+    PUBLIC_LABEL = 'Public holiday'
+    WEEKDAYS = tuple(enumerate(calendar.day_name)) + ((PUBLIC, PUBLIC_LABEL),)
+
+    weekday = blocks.ChoiceBlock(choices=WEEKDAYS, required=False)
+    label = blocks.CharBlock(help_text='Optionally override default weekday label', required=False)
+    date = blocks.DateBlock(help_text='Optionally specify a day these times are for', required=False)
+    start = blocks.TimeBlock(required=False)
+    end = blocks.TimeBlock(required=False)
+    closed = blocks.BooleanBlock(default=False, required=False)
+
+    class Meta:
+        template = 'wagtail_extensions/blocks/openingtime.html'
+
+    def clean(self, value):
+        cleaned = super().clean(value)
+        start, end, weekday, date = map(cleaned.get, ['start', 'end', 'weekday', 'date'])
+        errors = defaultdict(ErrorList)
+
+        if date and date < datetime.date.today():
+            err = ValidationError('Dates need to be in the future')
+            errors['date'].append(err)
+
+        if (start or end) and not (weekday or date):
+            err = ValidationError('Specifying a weekday or date is required')
+            errors['weekday'].append(err)
+
+        if start and end and end <= start:
+            err = ValidationError('End must be after start')
+            errors['end'].append(err)
+
+        if errors:
+            raise ValidationError("There is a problem with this opening time", params=errors)
+
+        return cleaned
+
+    def get_context(self, value, parent_context=None):
+        ctx = super().get_context(value, parent_context=parent_context)
+        weekday = ctx['value'].get('weekday')
+        if weekday is not None:
+            if weekday == self.PUBLIC:
+                ctx['is_public'] = True
+            else:
+                # Next date with this weekday
+                today = datetime.date.today()
+                ctx['next_date'] = today + relativedelta(weekday=weekday)
+        return ctx
+
+    def to_python(self, value):
+        weekday = value.get('weekday')
+        if weekday:
+            weekday_int = int(weekday)
+            value['weekday'] = weekday_int
+
+            label = value.get('label')
+            if weekday_int == self.PUBLIC and not label:
+                value['label'] = self.PUBLIC_LABEL
+        return super().to_python(value)
+
 
 class LocationBlock(blocks.StructBlock):
     name = blocks.CharBlock()
     address = AddressBlock(required=False)
     point = GeoBlock(required=False)
     departments = blocks.ListBlock(DepartmentBlock(label="department", required=False))
+    opening_times = blocks.ListBlock(OpeningTimeBlock(required=False))
     primary = blocks.BooleanBlock(default=False, required=False)

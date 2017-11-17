@@ -10,8 +10,17 @@ def first_true(iterable, predicate=None, default=None):
     """
     Returns first value for which predicate(item) is true
 
-    If no true value is found, returns the first value.
+    If no value is found, returns default.
+    """
+    return next(filter(predicate, iterable), default)
+
+
+def true_or_nth(iterable, predicate=None, n=0, default=None):
+    """
+    Returns first value for which predicate(item) is true
+
+    If no value is found, returns the nth (n) value.
 
     If the iterable is empty, return default.
     """
-    return next(filter(predicate, iterable), nth(iterable, 0, default=default))
+    return first_true(iterable, predicate=predicate, default=nth(iterable, n, default=default))

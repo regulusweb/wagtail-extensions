@@ -5,6 +5,7 @@ from setuptools import find_packages, setup
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 test_requires = [
+    'freezegun==0.3.9',
     'wagtail==1.13',
     'pytest==3.2.3',
     'pytest-django==3.1.2',
@@ -23,6 +24,7 @@ setup(
     author_email='craig@regulusweb.com',
     install_requires=[
         'django-phonenumber-field',
+        'dateutils',
         'wagtailgeowidget',
     ],
     extras_require={

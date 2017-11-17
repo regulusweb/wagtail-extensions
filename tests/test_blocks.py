@@ -1,8 +1,12 @@
+import datetime
+
 from django.core.exceptions import ValidationError
+from freezegun import freeze_time
 from phonenumber_field.phonenumber import PhoneNumber
 import pytest
 from wagtail.wagtailcore.models import Page
-from wagtail_extensions.blocks import DepartmentBlock, LinkBlock, PhoneBlock
+from wagtail_extensions.blocks import (DepartmentBlock, LinkBlock,
+                                       OpeningTimeBlock, PhoneBlock)
 
 
 def test_department_block_clean_invalid():
@@ -92,6 +96,76 @@ def test_link_block_get_context_with_url():
     link = LinkBlock()
     ctx = link.get_context({'url': 'some url'})
     assert ctx['has_url'] == True
+
+
+@freeze_time("2017-01-01")
+def test_openingtime_block_clean_date_in_past():
+    openingtime = OpeningTimeBlock()
+    with pytest.raises(ValidationError):
+        openingtime.clean({'date': '2016-01-01'})
+
+
+def test_openingtime_block_clean_end_before_start():
+    openingtime = OpeningTimeBlock()
+    with pytest.raises(ValidationError):
+        openingtime.clean({'start': '20:00', 'end': '08:00', 'weekday': '1'})
+
+
+def test_openingtime_block_clean_no_weekday_or_date():
+    openingtime = OpeningTimeBlock()
+    with pytest.raises(ValidationError):
+        openingtime.clean({'start': '20:00', 'end': '08:00'})
+
+
+@freeze_time("2017-01-01")
+def test_openingtime_block_clean_valid():
+    openingtime = OpeningTimeBlock()
+    openingtime.clean({'start': '08:00', 'end': '20:00', 'date': '2017-01-01'})
+
+
+def test_openingtime_block_get_context_no_weekday():
+    openingtime = OpeningTimeBlock()
+    openingtime.get_context({'value': {}})
+    # Pass without errors
+
+
+def test_openingtime_block_get_context_public():
+    openingtime = OpeningTimeBlock()
+    ctx = openingtime.get_context({'weekday': 7})
+    assert ctx['is_public'] == True
+
+
+@freeze_time("2017-01-01")
+def test_openingtime_block_get_context_next_date():
+    openingtime = OpeningTimeBlock()
+    ctx = openingtime.get_context({'weekday': 4})
+    # The first thursday after today (frozen above)
+    assert ctx['next_date'] == datetime.date(2017, 1, 6)
+
+
+def test_openingtime_block_to_python_no_weekday():
+    openingtime = OpeningTimeBlock()
+    openingtime.to_python({})
+    # Pass without error
+
+
+def test_openingtime_block_to_python_cast_weekday():
+    openingtime = OpeningTimeBlock()
+    value = openingtime.to_python({'weekday': '5'})
+    assert value['weekday'] == 5
+
+
+def test_openingtime_block_to_python_public_label():
+    openingtime = OpeningTimeBlock()
+    value = openingtime.to_python({'weekday': '7'})
+    assert value['label'] == OpeningTimeBlock.PUBLIC_LABEL
+
+
+def test_openingtime_block_to_python_public_with_label():
+    openingtime = OpeningTimeBlock()
+    label = 'Easter sunday'
+    value = openingtime.to_python({'weekday': '7', 'label': label})
+    assert value['label'] == label
 
 
 def test_phone_block_get_prep_value():

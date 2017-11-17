@@ -1,3 +1,6 @@
+import datetime
+
+from freezegun import freeze_time
 import pytest
 from wagtail.wagtailcore.models import Site
 
@@ -66,3 +69,81 @@ def test_contact_details_primary_phone_found(contact_setting):
         })
     ]
     assert contact_setting.primary_phone == '+447528712345'
+
+
+@pytest.mark.django_db
+def test_contact_details_primary_opening_times_found(contact_setting):
+    times = [{'label': 'My time'}]
+
+    contact_setting.locations = [
+        ('location', {
+            'primary': True,
+            'opening_times': times,
+        })
+    ]
+
+    assert contact_setting.primary_opening_times == times
+
+
+@pytest.mark.django_db
+def test_contact_details_primary_opening_times_none(contact_setting):
+    assert contact_setting.primary_opening_times == None
+
+
+@freeze_time("2017-06-06")
+@pytest.mark.django_db
+def test_contact_details_primary_opening_today_none(contact_setting):
+    contact_setting.locations = [
+        ('location', {
+            'primary': True,
+            'opening_times': [
+                {'weekday': 3},
+                {'date': datetime.date(2017, 6, 5)},
+                {'weekday': 7},
+            ],
+        })
+    ]
+
+    assert contact_setting.primary_opening_today == None
+
+
+@freeze_time("2017-06-06")
+@pytest.mark.django_db
+def test_contact_details_primary_opening_today_date(contact_setting):
+    match = {'date': datetime.date(2017, 6, 6)}
+
+    contact_setting.locations = [
+        ('location', {
+            'primary': True,
+            'opening_times': [
+                {'weekday': 1},
+                match,
+            ],
+        })
+    ]
+
+    assert contact_setting.primary_opening_today == match
+
+
+@freeze_time("2017-06-10")
+@pytest.mark.django_db
+def test_contact_details_primary_opening_today_weekday(contact_setting):
+    match = {'weekday': 5}
+
+    contact_setting.locations = [
+        ('location', {
+            'primary': True,
+            'opening_times': [
+                {'weekday': 3},
+                {'date': datetime.date(2017, 6, 5)},
+                match,
+            ],
+        })
+    ]
+
+    assert contact_setting.primary_opening_today == match
+
+
+@pytest.mark.django_db
+def test_contact_details_primary_opening_today_no_location(contact_setting):
+    assert contact_setting.primary_opening_today == None

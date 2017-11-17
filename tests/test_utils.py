@@ -1,4 +1,4 @@
-from wagtail_extensions.utils import first_true, nth
+from wagtail_extensions.utils import first_true, nth, true_or_nth
 
 
 def test_first_true_empty():
@@ -19,9 +19,15 @@ def test_first_true_match():
 
 
 def test_first_true_nomatch():
+    items = [{'match': False}, {'another': 5}]
+    item = first_true(items, predicate=lambda x: x.get('match') == True)
+    assert item == None
+
+
+def test_true_or_nth_nomatch():
     first = {'match': False}
     items = [first, {'another': 5}]
-    item = first_true(items, predicate=lambda x: x.get('match') == True)
+    item = true_or_nth(items, predicate=lambda x: x.get('match') == True)
     assert item == first
 
 
