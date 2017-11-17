@@ -6,6 +6,17 @@ from wagtail.wagtailcore import blocks
 from wagtailgeowidget.blocks import GeoBlock
 
 
+class StrippedListBlock(blocks.ListBlock):
+    """
+    Does not save empty values
+    """
+    def get_prep_value(self, value):
+        return [
+            self.child_block.get_prep_value(item)
+            for item in value if item != ''
+        ]
+
+
 class LinkBlock(blocks.StructBlock):
     text = blocks.CharBlock()
     page = blocks.PageChooserBlock(required=False)
@@ -65,12 +76,12 @@ class PhoneBlock(blocks.FieldBlock):
 class DepartmentBlock(blocks.StructBlock):
 
     name = blocks.CharBlock(required=False)
-    phones = blocks.ListBlock(PhoneBlock(required=False))
+    phones = StrippedListBlock(PhoneBlock(required=False))
     email = blocks.EmailBlock(required=False)
     primary = blocks.BooleanBlock(required=False, default=False)
 
     def clean(self, value):
-        phones = [p for p in value.get('phones', []) if p != '']
+        phones = value.get('phones', [])
         email = value.get('email')
         if not phones and not email:
             errors = {
@@ -81,10 +92,6 @@ class DepartmentBlock(blocks.StructBlock):
             raise ValidationError("There is a problem with this department", params=errors)
         return super().clean(value)
 
-    def to_python(self, value):
-        value = super().to_python(value)
-        value['non_empty_phones'] = [p for p in value.get('phones') if p != '']
-        return value
 
 
 class LocationBlock(blocks.StructBlock):

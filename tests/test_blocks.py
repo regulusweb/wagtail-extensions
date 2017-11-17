@@ -23,8 +23,8 @@ def test_department_block_to_python_empty():
 
 def test_department_block_to_python_strip_empty_phonenumbers():
     department = DepartmentBlock()
-    value = department.to_python({'phones': ['', '+447528712345', '']})
-    assert value['non_empty_phones'] == ['+447528712345']
+    value = department.get_prep_value({'phones': ['', '+447528712345', '']})
+    assert value['phones'] == ['+447528712345']
 
 
 @pytest.mark.django_db
