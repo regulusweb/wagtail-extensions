@@ -70,3 +70,17 @@ class ContactDetailsSetting(BaseSetting):
             specific_times = utils.first_true(opening_times, lambda x: x.get('date') == today)
             return specific_times or utils.first_true(opening_times, lambda x: x.get('weekday') == today.weekday())
         return None
+
+
+class SocialMediaSetting(BaseSetting):
+
+    class Meta:
+        abstract = True
+
+    profiles = fields.StreamField([
+        ('profile', extension_blocks.SocialMediaProfileBlock()),
+    ])
+
+    panels = (
+        StreamFieldPanel('profiles'),
+    )

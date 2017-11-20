@@ -3,6 +3,7 @@ from collections import defaultdict
 import datetime
 
 from dateutils import relativedelta
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
 from phonenumber_field import phonenumber
@@ -171,3 +172,12 @@ class LocationBlock(blocks.StructBlock):
     departments = blocks.ListBlock(DepartmentBlock(label="department", required=False))
     opening_times = blocks.ListBlock(OpeningTimeBlock(required=False))
     primary = blocks.BooleanBlock(default=False, required=False)
+
+
+class SocialMediaProfileBlock(blocks.StructBlock):
+
+    icon = blocks.ChoiceBlock(choices=settings.SOCIAL_MEDIA_TYPES)
+    url = blocks.URLBlock()
+
+    class Meta:
+        template = 'wagtail_extensions/blocks/social_media_profile.html'
