@@ -74,7 +74,7 @@ class ContactDetailsSetting(BaseSetting):
         today = date.today()
         cache_key = self.get_opening_today_cache_key(today)
         times = cache.get(cache_key)
-        if not times:
+        if times is not None:
             opening_times = self.primary_opening_times
             if opening_times:
                 specific_times = utils.first_true(opening_times, lambda x: x.get('date') == today)
