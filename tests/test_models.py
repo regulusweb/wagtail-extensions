@@ -147,3 +147,9 @@ def test_contact_details_primary_opening_today_weekday(contact_setting):
 @pytest.mark.django_db
 def test_contact_details_primary_opening_today_no_location(contact_setting):
     assert contact_setting.primary_opening_today == None
+
+
+def test_contact_details_get_opening_today_cache_key():
+    date = datetime.date(2017, 12, 5)
+    out = ContactDetailsTestSetting.get_opening_today_cache_key(date)
+    assert out == 'wagtail_extensions_opening_today_20171205'

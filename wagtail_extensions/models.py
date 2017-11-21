@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.core.cache import cache
 from wagtail.contrib.settings.models import BaseSetting
 from wagtail.wagtailadmin.edit_handlers import StreamFieldPanel
 from wagtail.wagtailcore import blocks, fields
@@ -24,8 +25,7 @@ class LinksSetting(BaseSetting):
 
 class ContactDetailsSetting(BaseSetting):
 
-    class Meta:
-        abstract = True
+    CACHE_KEY_OPENING_TODAY = "wagtail_extensions_opening_today_{:%Y%m%d}"
 
     locations = fields.StreamField([
         ('location', extension_blocks.LocationBlock()),
@@ -34,6 +34,13 @@ class ContactDetailsSetting(BaseSetting):
     panels = (
         StreamFieldPanel('locations'),
     )
+
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def get_opening_today_cache_key(cls, date):
+        return cls.CACHE_KEY_OPENING_TODAY.format(date)
 
     @property
     def primary_location(self):
@@ -64,9 +71,13 @@ class ContactDetailsSetting(BaseSetting):
 
     @property
     def primary_opening_today(self):
-        opening_times = self.primary_opening_times
-        if opening_times:
-            today = date.today()
-            specific_times = utils.first_true(opening_times, lambda x: x.get('date') == today)
-            return specific_times or utils.first_true(opening_times, lambda x: x.get('weekday') == today.weekday())
-        return None
+        today = date.today()
+        cache_key = self.get_opening_today_cache_key(today)
+        times = cache.get(cache_key)
+        if times is None:
+            opening_times = self.primary_opening_times
+            if opening_times:
+                specific_times = utils.first_true(opening_times, lambda x: x.get('date') == today)
+                times = specific_times or utils.first_true(opening_times, lambda x: x.get('weekday') == today.weekday())
+                cache.set(cache_key, times, 60*60*24)
+        return times
