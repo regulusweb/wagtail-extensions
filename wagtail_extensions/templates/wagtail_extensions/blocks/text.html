@@ -1,0 +1,3 @@
+{% load wagtailcore_tags %}
+{% if value.title %}<h3>{{ value.title }}</h3>{% endif %}
+{{ value.body|richtext }}

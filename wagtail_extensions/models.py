@@ -1,12 +1,37 @@
 from datetime import date
 
 from django.core.cache import cache
+from django.db import models
 from wagtail.contrib.settings.models import BaseSetting
 from wagtail.wagtailadmin.edit_handlers import StreamFieldPanel
 from wagtail.wagtailcore import blocks, fields
+from wagtail.wagtailcore.models import Page
+from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
 
 from . import blocks as extension_blocks
 from . import utils
+
+
+class ContentPage(Page):
+
+    class Meta:
+        abstract = True
+
+    featured_image = models.ForeignKey(
+        'wagtailimages.Image',
+        models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='+'
+    )
+    body = fields.StreamField([
+        ('text', extension_blocks.TextBlock()),
+    ], blank=True)
+
+    content_panels = Page.content_panels + [
+        ImageChooserPanel('featured_image'),
+        StreamFieldPanel('body'),
+    ]
 
 
 class LinksSetting(BaseSetting):

@@ -181,3 +181,12 @@ class SocialMediaProfileBlock(blocks.StructBlock):
 
     class Meta:
         template = 'wagtail_extensions/blocks/social_media_profile.html'
+
+
+class TextBlock(blocks.StructBlock):
+
+    title = blocks.CharBlock(required=False)
+    body = blocks.RichTextBlock()
+
+    class Meta:
+        template = 'wagtail_extensions/blocks/text.html'
