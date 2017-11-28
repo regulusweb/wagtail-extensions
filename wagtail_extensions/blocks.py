@@ -10,6 +10,7 @@ from django.forms.utils import ErrorList
 from phonenumber_field import phonenumber
 from phonenumber_field.formfields import PhoneNumberField
 from wagtail.wagtailcore import blocks
+from wagtail.wagtailimages.blocks import ImageChooserBlock
 from wagtailgeowidget.blocks import GeoBlock
 
 
