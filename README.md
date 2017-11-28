@@ -8,11 +8,11 @@ For various reusabled wagtail blocks and models.
 $ pip install https://github.com/regulusweb/wagtail-extensions/archive/master.zip
 ```
 
-Add `wagtail_extensions` and `wagtailgeowidget` to your `INSTALLED_APPS`:
+Add the following to your `INSTALLED_APPS`:
 
 ```
 INSTALLED_APPS = (
-    # ...
+    'wagtail.contrib.table_block',
     'wagtail_extensions',
     'wagtailgeowidget',
 )

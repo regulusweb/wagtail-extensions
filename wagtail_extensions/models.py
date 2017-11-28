@@ -3,6 +3,7 @@ from datetime import date
 from django.core.cache import cache
 from django.db import models
 from wagtail.contrib.settings.models import BaseSetting
+from wagtail.contrib.table_block.blocks import TableBlock
 from wagtail.wagtailadmin.edit_handlers import StreamFieldPanel
 from wagtail.wagtailcore import blocks, fields
 from wagtail.wagtailcore.models import Page
@@ -26,6 +27,7 @@ class ContentPage(Page):
     )
     body = fields.StreamField([
         ('text', extension_blocks.TextBlock()),
+        ('table', TableBlock()),
     ], blank=True)
 
     content_panels = Page.content_panels + [
@@ -104,7 +106,7 @@ class ContactDetailsSetting(BaseSetting):
             if opening_times:
                 specific_times = utils.first_true(opening_times, lambda x: x.get('date') == today)
                 times = specific_times or utils.first_true(opening_times, lambda x: x.get('weekday') == today.weekday())
-                cache.set(cache_key, times, 60*60*24)
+                cache.set(cache_key, dict(times), 60*60*24)
         return times
 
 
