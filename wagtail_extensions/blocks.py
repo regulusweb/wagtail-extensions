@@ -1,6 +1,7 @@
 import calendar
 from collections import defaultdict
 import datetime
+import math
 
 from dateutils import relativedelta
 from django.conf import settings
@@ -190,3 +191,16 @@ class TextBlock(blocks.StructBlock):
 
     class Meta:
         template = 'wagtail_extensions/blocks/text.html'
+
+
+class ImagesBlock(blocks.StructBlock):
+
+    images = blocks.ListBlock(ImageChooserBlock(required=False))
+
+    class Meta:
+        template = 'wagtail_extensions/blocks/images.html'
+
+    def get_context(self, value, parent_context=None):
+        ctx = super().get_context(value, parent_context=parent_context)
+        ctx['column_width'] = math.floor(12 / len(value.get('images', [])))
+        return ctx

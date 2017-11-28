@@ -28,6 +28,7 @@ class ContentPage(Page):
     body = fields.StreamField([
         ('text', extension_blocks.TextBlock()),
         ('table', TableBlock()),
+        ('images', extension_blocks.ImagesBlock()),
     ], blank=True)
 
     content_panels = Page.content_panels + [

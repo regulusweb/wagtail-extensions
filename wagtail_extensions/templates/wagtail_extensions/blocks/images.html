@@ -1,0 +1,8 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+<div class="row">
+{% for image in value.images %}
+    <div class="col-md-{{ column_width }}">
+        {% image image original class="img-responsive img-thumbnail" %}
+    </div>
+{% endfor %}
+</div>
