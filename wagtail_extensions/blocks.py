@@ -1,6 +1,7 @@
 import calendar
 from collections import defaultdict
 import datetime
+import uuid
 
 from dateutils import relativedelta
 from django.conf import settings
@@ -9,6 +10,7 @@ from django.forms.utils import ErrorList
 from phonenumber_field import phonenumber
 from phonenumber_field.formfields import PhoneNumberField
 from wagtail.wagtailcore import blocks
+from wagtail.wagtailimages.blocks import ImageChooserBlock
 from wagtailgeowidget.blocks import GeoBlock
 
 
@@ -24,7 +26,7 @@ class StrippedListBlock(blocks.ListBlock):
 
 
 class LinkBlock(blocks.StructBlock):
-    text = blocks.CharBlock()
+    text = blocks.CharBlock(required=False)
     page = blocks.PageChooserBlock(required=False)
     absolute_url = blocks.URLBlock(label="Url", required=False)
 
@@ -32,9 +34,7 @@ class LinkBlock(blocks.StructBlock):
         template = 'wagtail_extensions/blocks/link.html'
 
     def clean(self, value):
-        page = value.get('page')
-        absolute_url = value.get('absolute_url')
-        if (not page and not absolute_url) or (page and absolute_url):
+        if value.get('page') and value.get('absolute_url'):
             errors = {
                 'page': ErrorList([
                     ValidationError('Either a page or url must be defined'),
@@ -55,6 +55,30 @@ class LinkBlock(blocks.StructBlock):
     def get_context(self, value, parent_context=None):
         ctx = super().get_context(value, parent_context=parent_context)
         ctx['has_url'] = 'url' in value
+        return ctx
+
+
+class CarouselItemBlock(blocks.StructBlock):
+
+    image = ImageChooserBlock()
+    caption = blocks.CharBlock(required=False)
+    link = LinkBlock(required=False)
+
+    class Meta:
+        template = 'wagtail_extensions/blocks/carousel_item.html'
+
+
+class CarouselBlock(blocks.StructBlock):
+
+    items = blocks.ListBlock(CarouselItemBlock())
+
+    class Meta:
+        template = 'wagtail_extensions/blocks/carousel.html'
+
+    def get_context(self, value, parent_context=None):
+        ctx = super().get_context(value, parent_context=parent_context)
+        ctx['dom_id'] = 'carousel-'+uuid.uuid4().hex
+        ctx['show_indicators'] = len(value.get('items', [])) > 1
         return ctx
 
 
