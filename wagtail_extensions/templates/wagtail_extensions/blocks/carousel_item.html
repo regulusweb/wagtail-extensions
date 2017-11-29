@@ -1,0 +1,10 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% image item.image fill-1600x600 as item_image %}
+<div class="carousel-item {% if forloop.first %}active{% endif %}">
+    <a {% if item.link.url %}href="{{ item.link.url }}"{% endif %} class="item-inner" style="background-image: url({{ item_image.url }});">
+        <div class="carousel-caption">
+            <h3>{{ item.caption }}</h3>
+        </div>
+    </a>
+</div>
