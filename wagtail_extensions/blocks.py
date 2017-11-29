@@ -29,7 +29,7 @@ class StrippedListBlock(blocks.ListBlock):
 class LinkBlock(blocks.StructBlock):
     text = blocks.CharBlock(required=False)
     page = blocks.PageChooserBlock(required=False)
-    absolute_url = blocks.URLBlock(label="Url", required=False)
+    absolute_url = blocks.CharBlock(label="Url", required=False)
 
     class Meta:
         template = 'wagtail_extensions/blocks/link.html'
