@@ -5,7 +5,6 @@ import math
 import uuid
 
 from dateutils import relativedelta
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
 from phonenumber_field import phonenumber
@@ -13,6 +12,8 @@ from phonenumber_field.formfields import PhoneNumberField
 from wagtail.wagtailcore import blocks
 from wagtail.wagtailimages.blocks import ImageChooserBlock
 from wagtailgeowidget.blocks import GeoBlock
+
+from . import app_settings
 
 
 class StrippedListBlock(blocks.ListBlock):
@@ -201,7 +202,7 @@ class LocationBlock(blocks.StructBlock):
 
 class SocialMediaProfileBlock(blocks.StructBlock):
 
-    icon = blocks.ChoiceBlock(choices=settings.SOCIAL_MEDIA_TYPES)
+    icon = blocks.ChoiceBlock(choices=app_settings.SOCIAL_MEDIA_TYPES)
     url = blocks.URLBlock()
 
     class Meta:
