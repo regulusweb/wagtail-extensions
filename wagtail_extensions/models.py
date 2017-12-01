@@ -29,6 +29,7 @@ class ContentPage(Page):
         ('text', extension_blocks.TextBlock()),
         ('table', TableBlock()),
         ('images', extension_blocks.ImagesBlock()),
+        ('carousel', extension_blocks.CarouselBlock()),
     ], blank=True)
 
     content_panels = Page.content_panels + [
