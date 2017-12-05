@@ -52,14 +52,6 @@ def test_link_block_clean_both_page_and_url():
         })
 
 
-def test_link_block_clean_neither_page_and_url():
-    link = LinkBlock()
-    with pytest.raises(ValidationError):
-        link.clean({
-            'text': 'A link',
-        })
-
-
 @pytest.mark.django_db
 def test_link_block_to_python_page():
     link = LinkBlock()
