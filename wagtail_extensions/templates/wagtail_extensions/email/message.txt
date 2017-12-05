@@ -1,0 +1,7 @@
+{% load bleachclean from wagtailextensions_tags %}
+
+{% autoescape off %}
+Enquiry from {{ name }} ({{ email }}):
+{% endautoescape %}
+
+{{ message|bleachclean }}
