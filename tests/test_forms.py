@@ -1,7 +1,5 @@
 from unittest.mock import Mock, patch
 
-from django.core import mail
-
 from wagtail_extensions.forms import ContactForm
 
 
