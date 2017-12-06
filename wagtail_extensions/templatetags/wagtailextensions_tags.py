@@ -3,6 +3,7 @@ from urllib.parse import urlsplit
 from django.template import Library
 from django.template.defaultfilters import stringfilter
 
+import bleach
 from wagtailgeowidget.app_settings import (
     GEO_WIDGET_ZOOM,
     GOOGLE_MAPS_V3_APIKEY,
@@ -33,7 +34,6 @@ def humanize_url(value):
     return urlsplit(value)[1]
 
 
-
 @register.simple_tag
 def humanize_date_range(start, end):
     day_fmt = '%d %b %Y'
@@ -44,3 +44,8 @@ def humanize_date_range(start, end):
     else:
         start_fmt = '%d %b %Y'
     return "{} - {}".format(start.strftime(start_fmt), end.strftime(day_fmt))
+
+
+@register.filter
+def bleachclean(value):
+    return bleach.clean(value, strip=True)

@@ -26,6 +26,11 @@ setup(
         'django-phonenumber-field',
         'dateutils',
         'wagtailgeowidget',
+
+        # contact
+        'django-honeypot>=0.6.0',
+        'django-crispy-forms>=1.6.1',
+        'bleach>=2.0.0',
     ],
     extras_require={
         'test': test_requires,
