@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from django.core import mail
 
@@ -40,11 +40,19 @@ def test_go_to_without_enquiryemail():
     assert to == ['admin@localhost.com']
 
 
-def test_save():
+@patch('wagtail_extensions.forms.ContactForm.send_email')
+@patch('wagtail_extensions.forms.ContactForm.get_to')
+def test_save(mocked_get_to, mocked_send_email):
     form = ContactForm()
     form.cleaned_data = cleaned_data
     page = Mock()
     page.enquiry_email = 'e@e.com'
     form.save(page)
 
-    assert len(mail.outbox) == 1
+    mocked_get_to.assert_called_once_with(page)
+    mocked_send_email.assert_called_once_with(
+        mocked_get_to.return_value,
+        'wagtail_extensions/email/subject.txt',
+        'wagtail_extensions/email/message.txt',
+        ['t@t.com']
+    )
