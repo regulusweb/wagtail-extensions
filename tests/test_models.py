@@ -73,12 +73,12 @@ def test_contact_details_primary_phone_found(contact_setting):
 
 @pytest.mark.django_db
 def test_contact_details_primary_opening_times_found(contact_setting):
-    times = [{'label': 'My time'}]
+    times = {'times': [{'label': 'My time'}]}
 
     contact_setting.locations = [
         ('location', {
             'primary': True,
-            'opening_times': {'times': times},
+            'opening_times': times,
         })
     ]
 

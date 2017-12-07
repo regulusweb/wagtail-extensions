@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import patch
 
 from django.core.exceptions import ValidationError
 from freezegun import freeze_time
@@ -6,7 +7,8 @@ from phonenumber_field.phonenumber import PhoneNumber
 import pytest
 from wagtail.wagtailcore.models import Page
 from wagtail_extensions.blocks import (DepartmentBlock, LinkBlock,
-                                       OpeningTimeBlock, PhoneBlock)
+                                       OpeningTimeBlock, OpeningTimesBlock,
+                                       PhoneBlock)
 
 
 def test_department_block_clean_invalid():
@@ -115,15 +117,15 @@ def test_openingtime_block_clean_valid():
     openingtime.clean({'start': '08:00', 'end': '20:00', 'date': '2017-01-01'})
 
 
-def test_openingtime_block_get_context_no_weekday():
-    openingtime = OpeningTimeBlock()
-    openingtime.to_python({'value': {}})
-    # Pass without errors
-
-
-def test_openingtime_block_get_context_public():
+def test_openingtime_block_to_python_public():
     openingtime = OpeningTimeBlock()
     value = openingtime.to_python({'weekday': 7})
+    assert value['specific'] == True
+
+
+def test_openingtime_block_to_python_date():
+    openingtime = OpeningTimeBlock()
+    value = openingtime.to_python({'weekday': 4, 'date': '2017-10-05'})
     assert value['specific'] == True
 
 
@@ -158,6 +160,38 @@ def test_openingtime_block_to_python_public_with_label():
     label = 'Easter sunday'
     value = openingtime.to_python({'weekday': '7', 'label': label})
     assert value['label'] == label
+
+
+def test_openingtimes_block_time_keyfunc_specific():
+    value = {'specific': True}
+    out = OpeningTimesBlock.time_keyfunc(value)
+    assert out is value
+
+
+def test_openingtimes_block_time_keyfunc_non_specific():
+    value = {'start': 5, 'end': 10}
+    out = OpeningTimesBlock.time_keyfunc(value)
+    assert out == (5, 10)
+
+
+@patch('wagtail_extensions.blocks.groupby')
+def test_openingtimes_block_group_times(mocked_groupby):
+    value = {}
+    mocked_groupby.return_value = [('first', [1, 4, 5]), ('second', [7, 10])]
+    out = OpeningTimesBlock.group_times(value)
+
+    assert out == [[1, 4, 5], [7, 10]]
+    mocked_groupby.assert_called_once_with(value, OpeningTimesBlock.time_keyfunc)
+
+
+def test_openingtimes_block_get_context():
+    openingtimes = OpeningTimesBlock()
+    expected = {}
+    value = {'times': [1, 5, 10]}
+    with patch.object(openingtimes, 'group_times', return_value=expected) as mocked:
+        ctx = openingtimes.get_context(value)
+        mocked.assert_called_once_with([1, 5, 10])
+        assert ctx['times'] == expected
 
 
 def test_phone_block_get_prep_value():

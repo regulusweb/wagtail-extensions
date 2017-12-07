@@ -186,6 +186,9 @@ class OpeningTimeBlock(blocks.StructBlock):
                 # Next date with this weekday
                 today = datetime.date.today()
                 value['next_date'] = today + relativedelta(weekday=weekday_int)
+
+        if value.get('date'):
+            value['specific'] = True
         return value
 
 
@@ -211,13 +214,12 @@ class OpeningTimesBlock(blocks.StructBlock):
 
     @classmethod
     def group_times(cls, value):
-        return groupby(value, cls.time_keyfunc)
+        # Read out groups to simplify templates
+        return [list(group) for key, group in groupby(value, cls.time_keyfunc)]
 
     def get_context(self, value, parent_context=None):
         ctx = super().get_context(value, parent_context=parent_context)
-        grouped_times = self.group_times(value.get('times'))
-        # Read out groups to simplify templates
-        ctx['times'] = [list(grouper) for key, grouper in grouped_times]
+        ctx['times'] = self.group_times(value.get('times'))
         return ctx
 
 
