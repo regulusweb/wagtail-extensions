@@ -78,7 +78,7 @@ def test_contact_details_primary_opening_times_found(contact_setting):
     contact_setting.locations = [
         ('location', {
             'primary': True,
-            'opening_times': times,
+            'opening_times': {'times': times},
         })
     ]
 
@@ -96,11 +96,11 @@ def test_contact_details_primary_opening_today_none(contact_setting):
     contact_setting.locations = [
         ('location', {
             'primary': True,
-            'opening_times': [
+            'opening_times': {'times': [
                 {'weekday': 3},
                 {'date': datetime.date(2017, 6, 5)},
                 {'weekday': 7},
-            ],
+            ]},
         })
     ]
 
@@ -115,10 +115,10 @@ def test_contact_details_primary_opening_today_date(contact_setting):
     contact_setting.locations = [
         ('location', {
             'primary': True,
-            'opening_times': [
+            'opening_times': {'times': [
                 {'weekday': 1},
                 match,
-            ],
+            ]},
         })
     ]
 
@@ -133,11 +133,11 @@ def test_contact_details_primary_opening_today_weekday(contact_setting):
     contact_setting.locations = [
         ('location', {
             'primary': True,
-            'opening_times': [
+            'opening_times': {'times': [
                 {'weekday': 3},
                 {'date': datetime.date(2017, 6, 5)},
                 match,
-            ],
+            ]},
         })
     ]
 

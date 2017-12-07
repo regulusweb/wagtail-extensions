@@ -117,22 +117,22 @@ def test_openingtime_block_clean_valid():
 
 def test_openingtime_block_get_context_no_weekday():
     openingtime = OpeningTimeBlock()
-    openingtime.get_context({'value': {}})
+    openingtime.to_python({'value': {}})
     # Pass without errors
 
 
 def test_openingtime_block_get_context_public():
     openingtime = OpeningTimeBlock()
-    ctx = openingtime.get_context({'weekday': 7})
-    assert ctx['is_public'] == True
+    value = openingtime.to_python({'weekday': 7})
+    assert value['specific'] == True
 
 
 @freeze_time("2017-01-01")
-def test_openingtime_block_get_context_next_date():
+def test_openingtime_block_to_python_next_date():
     openingtime = OpeningTimeBlock()
-    ctx = openingtime.get_context({'weekday': 4})
+    value = openingtime.to_python({'weekday': 4})
     # The first thursday after today (frozen above)
-    assert ctx['next_date'] == datetime.date(2017, 1, 6)
+    assert value['next_date'] == datetime.date(2017, 1, 6)
 
 
 def test_openingtime_block_to_python_no_weekday():

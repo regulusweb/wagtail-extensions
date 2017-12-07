@@ -1,6 +1,7 @@
 import calendar
 from collections import defaultdict
 import datetime
+from itertools import groupby
 import math
 import uuid
 
@@ -133,9 +134,10 @@ class OpeningTimeBlock(blocks.StructBlock):
     """
     PUBLIC = 7
     PUBLIC_LABEL = 'Public holiday'
-    WEEKDAYS = tuple(enumerate(calendar.day_name)) + ((PUBLIC, PUBLIC_LABEL),)
+    WEEKDAYS = tuple(enumerate(calendar.day_name))
+    ALL_DAYS = WEEKDAYS + ((PUBLIC, PUBLIC_LABEL),)
 
-    weekday = blocks.ChoiceBlock(choices=WEEKDAYS, required=False)
+    weekday = blocks.ChoiceBlock(choices=ALL_DAYS, required=False)
     label = blocks.CharBlock(help_text='Optionally override default weekday label', required=False)
     date = blocks.DateBlock(help_text='Optionally specify a day these times are for', required=False)
     start = blocks.TimeBlock(required=False)
@@ -167,28 +169,56 @@ class OpeningTimeBlock(blocks.StructBlock):
 
         return cleaned
 
-    def get_context(self, value, parent_context=None):
-        ctx = super().get_context(value, parent_context=parent_context)
-        weekday = ctx['value'].get('weekday')
-        if weekday is not None:
-            if weekday == self.PUBLIC:
-                ctx['is_public'] = True
-            else:
-                # Next date with this weekday
-                today = datetime.date.today()
-                ctx['next_date'] = today + relativedelta(weekday=weekday)
-        return ctx
-
     def to_python(self, value):
+        value = super().to_python(value)
         weekday = value.get('weekday')
-        if weekday:
+        if weekday is not None:
             weekday_int = int(weekday)
             value['weekday'] = weekday_int
 
             label = value.get('label')
             if weekday_int == self.PUBLIC and not label:
                 value['label'] = self.PUBLIC_LABEL
-        return super().to_python(value)
+
+            if weekday_int == self.PUBLIC or value.get('date'):
+                value['specific'] = True
+            else:
+                # Next date with this weekday
+                today = datetime.date.today()
+                value['next_date'] = today + relativedelta(weekday=weekday_int)
+        return value
+
+
+class OpeningTimesBlock(blocks.StructBlock):
+    """
+    Using a StructBlock as subclassing ListBlock leads to problems when
+    Wagtail does template rendering.
+    """
+    times = blocks.ListBlock(OpeningTimeBlock(required=False))
+
+    class Meta:
+        template = 'wagtail_extensions/blocks/opening_times.html'
+
+    @staticmethod
+    def time_keyfunc(opening_time):
+        if opening_time.get('specific'):
+            return opening_time
+        else:
+            return (
+                opening_time.get('start'),
+                opening_time.get('end'),
+            )
+
+    @classmethod
+    def group_times(cls, value):
+        return groupby(value, cls.time_keyfunc)
+
+    def get_context(self, value, parent_context=None):
+        ctx = super().get_context(value, parent_context=parent_context)
+        grouped_times = self.group_times(value.get('times'))
+        # Read out groups to simplify templates
+        ctx['times'] = [list(grouper) for key, grouper in grouped_times]
+        return ctx
 
 
 class LocationBlock(blocks.StructBlock):
@@ -196,7 +226,7 @@ class LocationBlock(blocks.StructBlock):
     address = AddressBlock(required=False)
     point = GeoBlock(required=False)
     departments = blocks.ListBlock(DepartmentBlock(label="department", required=False))
-    opening_times = blocks.ListBlock(OpeningTimeBlock(required=False))
+    opening_times = OpeningTimesBlock(required=False)
     primary = blocks.BooleanBlock(default=False, required=False)
 
 
