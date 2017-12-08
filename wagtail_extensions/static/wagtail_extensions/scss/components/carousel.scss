@@ -14,4 +14,27 @@
         padding-bottom: 40px;
         background: rgba(0, 0, 0, 0.7);
     }
+
+    &.with-thumbnails {
+        margin-bottom: 115px;
+    }
+
+    .carousel-thumbnails {
+        bottom: -100px;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 15px;
+        background: #000;
+
+        li {
+            width: auto !important;
+            height: auto !important;
+            text-indent: initial !important;
+            opacity: 0.5;
+
+            &.active {
+                opacity: 1;
+            }
+        }
+    }
 }
