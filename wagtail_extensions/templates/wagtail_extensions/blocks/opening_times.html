@@ -1,0 +1,22 @@
+{% load wagtailcore_tags %}
+<ul class="opening-times">
+{% for group in times %}
+    <li>
+    {% if group|length == 1 %}
+        {% with first=group|first %}
+        <div class="opening-time">
+            <span class="opening-time-label">{% firstof first.label first.date first.next_date|date:"D" %}</span>
+            <span class="opening-time-times">{% if first.closed %}Closed{% else %}{{ first.start|time:"h:i A" }} - {{ first.end|time:"h:i A" }}{% endif %}</span>
+        </div>
+        {% endwith %}
+    {% else %}
+        {% with first=group|first last=group|last %}
+            <div class="opening-time">
+                <span class="opening-time-label">{% firstof first.label first.next_date|date:"D" %} - {% firstof last.label last.next_date|date:"D" %}</span>
+                <span class="opening-time-times">{% if first.closed %}Closed{% else %}{{ first.start|time:"h:i A" }} - {{ first.end|time:"h:i A" }}{% endif %}</span>
+            </div>
+        {% endwith %}
+    {% endif %}
+    </li>
+{% endfor %}
+</ul>

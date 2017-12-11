@@ -106,8 +106,9 @@ class ContactDetailsSetting(BaseSetting):
         if times is None:
             opening_times = self.primary_opening_times
             if opening_times:
-                specific_times = utils.first_true(opening_times, lambda x: x.get('date') == today)
-                times = specific_times or utils.first_true(opening_times, lambda x: x.get('weekday') == today.weekday())
+                times = opening_times.get('times')
+                specific_times = utils.first_true(times, lambda x: x.get('date') == today)
+                times = specific_times or utils.first_true(times, lambda x: x.get('weekday') == today.weekday())
                 if times:
                     cache.set(cache_key, dict(times), 60*60*24)
         return times
