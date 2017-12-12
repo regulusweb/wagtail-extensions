@@ -1,0 +1,11 @@
+<div class="opening-time">
+    <span class="opening-time-label">
+        {% firstof value.label value.date as label %}
+        {% if label %}
+
+        {% else %}
+            value.bound_blocks.next_date|date:"l" %}
+        {% endif %}
+    </span>
+    <span class="opening-time-times">{% include "wagtail_extensions/partials/opening_time.html" with time=value %}</span>
+</div>
