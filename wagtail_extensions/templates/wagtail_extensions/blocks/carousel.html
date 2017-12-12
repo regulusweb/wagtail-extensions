@@ -1,9 +1,13 @@
-{% load wagtailcore_tags %}
-<div id="{{ dom_id }}" class="carousel slide" data-ride="carousel">
+{% load wagtailcore_tags wagtailimages_tags %}
+<div id="{{ dom_id }}" class="carousel slide{% if value.show_thumbnails %} with-thumbnails{% endif %}" data-ride="carousel">
     {% if show_indicators %}
-    <ol class="carousel-indicators">
+    <ol class="carousel-indicators{% if value.show_thumbnails %} carousel-thumbnails{% endif %}">
         {% for item in value.items %}
-        <li data-target="#{{ dom_id }}" data-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></li>
+        <li data-target="#{{ dom_id }}" data-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}>
+            {% if value.show_thumbnails %}
+                {% image item.image fill-60x60 %}
+            {% endif %}
+        </li>
         {% endfor %}
     </ol>
     {% endif %}

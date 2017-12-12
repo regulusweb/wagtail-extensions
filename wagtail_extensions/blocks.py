@@ -74,6 +74,7 @@ class CarouselItemBlock(blocks.StructBlock):
 class CarouselBlock(blocks.StructBlock):
 
     items = blocks.ListBlock(CarouselItemBlock())
+    show_thumbnails = blocks.BooleanBlock(default=False, required=False)
 
     class Meta:
         template = 'wagtail_extensions/blocks/carousel.html'
