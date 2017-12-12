@@ -27,9 +27,9 @@
         background: #000;
 
         li {
-            width: auto !important;
-            height: auto !important;
-            text-indent: initial !important;
+            width: auto;
+            height: auto;
+            text-indent: initial;
             opacity: 0.5;
 
             &.active {
