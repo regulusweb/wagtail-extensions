@@ -22,6 +22,7 @@ setup(
     url='https://github.com/regulusweb/wagtail-extensions',
     author='Regulus Ltd',
     author_email='reg@regulusweb.com',
+    python_requires='>=3.4',
     install_requires=[
         'django-phonenumber-field',
         'dateutils',
