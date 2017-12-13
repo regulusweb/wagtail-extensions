@@ -104,31 +104,37 @@ def test_contact_details_primary_opening_today_none(contact_setting):
         })
     ]
 
+    contact_setting.save()
+    contact_setting.refresh_from_db()
+
     assert contact_setting.primary_opening_today == None
 
 
 @freeze_time("2017-06-06")
 @pytest.mark.django_db
 def test_contact_details_primary_opening_today_date(contact_setting):
-    match = {'date': datetime.date(2017, 6, 6)}
+    match = datetime.date(2017, 6, 6)
 
     contact_setting.locations = [
         ('location', {
             'primary': True,
             'opening_times': {'times': [
                 {'weekday': 1},
-                match,
+                {'date': match},
             ]},
         })
     ]
 
-    assert contact_setting.primary_opening_today == match
+    contact_setting.save()
+    contact_setting.refresh_from_db()
+
+    assert contact_setting.primary_opening_today['date'] == match
 
 
 @freeze_time("2017-06-10")
 @pytest.mark.django_db
 def test_contact_details_primary_opening_today_weekday(contact_setting):
-    match = {'weekday': 5}
+    match = 5
 
     contact_setting.locations = [
         ('location', {
@@ -136,12 +142,15 @@ def test_contact_details_primary_opening_today_weekday(contact_setting):
             'opening_times': {'times': [
                 {'weekday': 3},
                 {'date': datetime.date(2017, 6, 5)},
-                match,
+                {'weekday': 5},
             ]},
         })
     ]
 
-    assert contact_setting.primary_opening_today == match
+    contact_setting.save()
+    contact_setting.refresh_from_db()
+
+    assert contact_setting.primary_opening_today['weekday'] == match
 
 
 @pytest.mark.django_db
@@ -149,7 +158,7 @@ def test_contact_details_primary_opening_today_no_location(contact_setting):
     assert contact_setting.primary_opening_today == None
 
 
+@freeze_time("2017-12-05")
 def test_contact_details_get_opening_today_cache_key():
-    date = datetime.date(2017, 12, 5)
-    out = ContactDetailsTestSetting.get_opening_today_cache_key(date)
+    out = ContactDetailsTestSetting.get_opening_today_cache_key()
     assert out == 'wagtail_extensions_opening_today_20171205'

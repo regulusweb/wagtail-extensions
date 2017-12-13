@@ -1,7 +1,6 @@
-from datetime import date
-
-from django.core.cache import cache
 from django.db import models
+from django.utils.timezone import now
+
 from wagtail.contrib.settings.models import BaseSetting
 from wagtail.contrib.table_block.blocks import TableBlock
 from wagtail.wagtailadmin.edit_handlers import StreamFieldPanel
@@ -68,8 +67,9 @@ class ContactDetailsSetting(BaseSetting):
         abstract = True
 
     @classmethod
-    def get_opening_today_cache_key(cls, date):
-        return cls.CACHE_KEY_OPENING_TODAY.format(date)
+    def get_opening_today_cache_key(cls):
+        today = now().date()
+        return cls.CACHE_KEY_OPENING_TODAY.format(today)
 
     @property
     def primary_location(self):
@@ -100,18 +100,10 @@ class ContactDetailsSetting(BaseSetting):
 
     @property
     def primary_opening_today(self):
-        today = date.today()
-        cache_key = self.get_opening_today_cache_key(today)
-        times = cache.get(cache_key)
-        if times is None:
-            opening_times = self.primary_opening_times
-            if opening_times:
-                times = opening_times.get('times')
-                specific_times = utils.first_true(times, lambda x: x.get('date') == today)
-                times = specific_times or utils.first_true(times, lambda x: x.get('weekday') == today.weekday())
-                if times:
-                    cache.set(cache_key, dict(times), 60*60*24)
-        return times
+        if self.primary_opening_times:
+            cache_key = self.get_opening_today_cache_key()
+            return self.primary_opening_times.block.opening_today(self.primary_opening_times, cache_key=cache_key)
+        return None
 
 
 class SocialMediaSetting(BaseSetting):

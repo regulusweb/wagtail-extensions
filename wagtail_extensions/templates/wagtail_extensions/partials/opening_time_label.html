@@ -1,0 +1,8 @@
+{% load wagtailextensions_tags %}
+{% firstof time.label time.date as label %}
+{% if label %}
+    {{ label }}
+{% else %}
+    {% block_method time 'next_date' as next_date %}
+    {{ next_date|date:"D" }}
+{% endif %}

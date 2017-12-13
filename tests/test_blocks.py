@@ -117,26 +117,6 @@ def test_openingtime_block_clean_valid():
     openingtime.clean({'start': '08:00', 'end': '20:00', 'date': '2017-01-01'})
 
 
-def test_openingtime_block_to_python_public():
-    openingtime = OpeningTimeBlock()
-    value = openingtime.to_python({'weekday': 7})
-    assert value['specific'] == True
-
-
-def test_openingtime_block_to_python_date():
-    openingtime = OpeningTimeBlock()
-    value = openingtime.to_python({'weekday': 4, 'date': '2017-10-05'})
-    assert value['specific'] == True
-
-
-@freeze_time("2017-01-01")
-def test_openingtime_block_to_python_next_date():
-    openingtime = OpeningTimeBlock()
-    value = openingtime.to_python({'weekday': 4})
-    # The first thursday after today (frozen above)
-    assert value['next_date'] == datetime.date(2017, 1, 6)
-
-
 def test_openingtime_block_to_python_no_weekday():
     openingtime = OpeningTimeBlock()
     openingtime.to_python({})
@@ -162,16 +142,49 @@ def test_openingtime_block_to_python_public_with_label():
     assert value['label'] == label
 
 
+def test_openingtime_block_single_date_empty():
+    assert OpeningTimeBlock.single_date({}) == False
+
+
+def test_openingtime_block_single_date_with_date():
+    assert OpeningTimeBlock.single_date({'date': 'some date'}) == True
+
+
+def test_openingtime_block_single_date_public():
+    assert OpeningTimeBlock.single_date({'weekday': 7}) == True
+
+
+def test_openingtime_block_next_date_empty():
+    assert OpeningTimeBlock.next_date({}) is None
+
+
+@freeze_time("2017-12-13")
+def test_openingtime_block_next_date_today():
+    assert OpeningTimeBlock.next_date({'weekday': 2}) == datetime.date(2017, 12, 13)
+
+
+@freeze_time("2017-12-13")
+def test_openingtime_block_next_date_sunday():
+    assert OpeningTimeBlock.next_date({'weekday': 6}) == datetime.date(2017, 12, 17)
+
+
+@freeze_time("2017-12-13")
+def test_openingtime_block_next_date_public():
+    assert OpeningTimeBlock.next_date({'weekday': 7}) is None
+
+
 def test_openingtimes_block_time_keyfunc_specific():
-    value = {'specific': True}
-    out = OpeningTimesBlock.time_keyfunc(value)
+    openingtime = OpeningTimeBlock()
+    value = openingtime.to_python({})
+    with patch.object(openingtime, 'single_date', return_value=True):
+        out = OpeningTimesBlock.time_keyfunc(value)
     assert out is value
 
 
 def test_openingtimes_block_time_keyfunc_non_specific():
-    value = {'start': 5, 'end': 10}
+    value = OpeningTimeBlock().to_python({'start': '5:00', 'end': '10:00'})
     out = OpeningTimesBlock.time_keyfunc(value)
-    assert out == (5, 10)
+    assert out == (datetime.time(5), datetime.time(10))
 
 
 @patch('wagtail_extensions.blocks.groupby')
@@ -184,14 +197,68 @@ def test_openingtimes_block_group_times(mocked_groupby):
     mocked_groupby.assert_called_once_with(value, OpeningTimesBlock.time_keyfunc)
 
 
+def test_openingtimes_block_get_time_for_date_empty():
+    assert OpeningTimesBlock.get_time_for_date(None, None) is None
+
+
+def test_openingtimes_block_get_time_for_date_no_times():
+    assert OpeningTimesBlock.get_time_for_date({}, datetime.date(2017, 12, 10)) is None
+
+
+def test_openingtimes_block_get_time_for_date_times_date():
+    match = {'date': datetime.date(2017, 12, 10)}
+    value = {
+        'times': [
+            {'weekday': 4},
+            match,
+        ],
+    }
+    assert OpeningTimesBlock.get_time_for_date(value, datetime.date(2017, 12, 10)) == match
+
+
+def test_openingtimes_block_get_time_for_date_times_weekday():
+    match = {'weekday': 6}
+    value = {
+        'times': [
+            {'weekday': 4},
+            {'date': datetime.date(2017, 12, 10)},
+            match,
+        ],
+    }
+    assert OpeningTimesBlock.get_time_for_date(value, datetime.date(2017, 12, 17)) == match
+
+
+def test_openingtimes_block_get_time_for_date_times_no_match():
+    value = {
+        'times': [
+            {'weekday': 4},
+            {'date': datetime.date(2017, 12, 10)},
+            {'weekday': 2},
+        ],
+    }
+    assert OpeningTimesBlock.get_time_for_date(value, datetime.date(2017, 12, 17)) is None
+
+
+@freeze_time('2017-06-28')
+def test_openingtimes_block_opening_today():
+    openingtimes = OpeningTimesBlock
+    with patch.object(openingtimes, 'get_time_for_date') as mocked_get:
+        value = 'test'
+        out = openingtimes.opening_today(value)
+        mocked_get.assert_called_once_with(value, datetime.date(2017, 6, 28))
+        assert out == mocked_get.return_value
+
+
 def test_openingtimes_block_get_context():
     openingtimes = OpeningTimesBlock()
-    expected = {}
     value = {'times': [1, 5, 10]}
-    with patch.object(openingtimes, 'group_times', return_value=expected) as mocked:
+    with patch.object(openingtimes, 'group_times') as mocked_group,\
+          patch.object(openingtimes, 'opening_today') as mocked_today:
         ctx = openingtimes.get_context(value)
-        mocked.assert_called_once_with([1, 5, 10])
-        assert ctx['times'] == expected
+        mocked_group.assert_called_once_with([1, 5, 10])
+        mocked_today.assert_called_once_with(value)
+        assert ctx['times'] == mocked_group.return_value
+        assert ctx['today'] == mocked_today.return_value
 
 
 def test_phone_block_get_prep_value():

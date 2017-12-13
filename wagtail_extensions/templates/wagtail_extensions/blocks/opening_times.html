@@ -1,19 +1,39 @@
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags wagtailextensions_tags %}
 <ul class="opening-times">
+{% if today %}
+    <li class="opening-time opening-time-today {% if today.closed %}opening-time-closed{% else %}opening-time-open{% endif %}">
+        <span class="opening-time-label">
+            Today
+        </span>
+        <span class="opening-time-times">
+            {% include "wagtail_extensions/partials/opening_time.html" with time=today %}
+        </span>
+    </li>
+{% endif %}
 {% for group in times %}
     <li>
     {% if group|length == 1 %}
         {% with first=group|first %}
         <div class="opening-time">
-            <span class="opening-time-label">{% firstof first.label first.date first.next_date|date:"D" %}</span>
-            <span class="opening-time-times">{% if first.closed %}Closed{% else %}{{ first.start|time:"H:i" }} - {{ first.end|time:"H:i" }}{% endif %}</span>
+            <span class="opening-time-label">
+                {% include "wagtail_extensions/partials/opening_time_label.html" with time=first %}
+            </span>
+            <span class="opening-time-times">
+                {% include "wagtail_extensions/partials/opening_time.html" with time=first %}
+            </span>
         </div>
         {% endwith %}
     {% else %}
         {% with first=group|first last=group|last %}
             <div class="opening-time">
-                <span class="opening-time-label">{% firstof first.label first.next_date|date:"D" %} - {% firstof last.label last.next_date|date:"D" %}</span>
-                <span class="opening-time-times">{% if first.closed %}Closed{% else %}{{ first.start|time:"H:i" }} - {{ first.end|time:"H:i" }}{% endif %}</span>
+                <span class="opening-time-label">
+                    {% include "wagtail_extensions/partials/opening_time_label.html" with time=first %}
+                    -
+                    {% include "wagtail_extensions/partials/opening_time_label.html" with time=last %}
+                </span>
+                <span class="opening-time-times">
+                    {% include "wagtail_extensions/partials/opening_time.html" with time=first %}
+                </span>
             </div>
         {% endwith %}
     {% endif %}

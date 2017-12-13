@@ -1,13 +1,16 @@
 import calendar
 from collections import defaultdict
 import datetime
+from functools import partial
 from itertools import groupby
 import math
 import uuid
 
 from dateutils import relativedelta
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
+from django.utils.timezone import now
 from phonenumber_field import phonenumber
 from phonenumber_field.formfields import PhoneNumberField
 from wagtail.wagtailcore import blocks
@@ -15,6 +18,7 @@ from wagtail.wagtailimages.blocks import ImageChooserBlock
 from wagtailgeowidget.blocks import GeoBlock
 
 from . import app_settings
+from . import utils
 
 
 class StrippedListBlock(blocks.ListBlock):
@@ -130,8 +134,6 @@ class DepartmentBlock(blocks.StructBlock):
 class OpeningTimeBlock(blocks.StructBlock):
     """
     A semi-structured opening times block.
-
-    Period is left as a free text input to allow for
     """
     PUBLIC = 7
     PUBLIC_LABEL = 'Public holiday'
@@ -146,7 +148,7 @@ class OpeningTimeBlock(blocks.StructBlock):
     closed = blocks.BooleanBlock(default=False, required=False)
 
     class Meta:
-        template = 'wagtail_extensions/blocks/openingtime.html'
+        template = 'wagtail_extensions/blocks/opening_time.html'
 
     def clean(self, value):
         cleaned = super().clean(value)
@@ -174,23 +176,31 @@ class OpeningTimeBlock(blocks.StructBlock):
         value = super().to_python(value)
         weekday = value.get('weekday')
         if weekday is not None:
-            weekday_int = int(weekday)
-            value['weekday'] = weekday_int
+            value['weekday'] = int(weekday)
 
             label = value.get('label')
-            if weekday_int == self.PUBLIC and not label:
+            if value['weekday'] == self.PUBLIC and not label:
                 value['label'] = self.PUBLIC_LABEL
-
-            if weekday_int == self.PUBLIC or value.get('date'):
-                value['specific'] = True
-            else:
-                # Next date with this weekday
-                today = datetime.date.today()
-                value['next_date'] = today + relativedelta(weekday=weekday_int)
-
-        if value.get('date'):
-            value['specific'] = True
         return value
+
+    @classmethod
+    def single_date(cls, value):
+        if value.get('date'):
+            return True
+        elif value.get('weekday') == cls.PUBLIC:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def next_date(cls, value):
+        weekday = value.get('weekday')
+        if weekday is not None and weekday != cls.PUBLIC:
+            # Next date with this weekday
+            today = now().date()
+            return today + relativedelta(weekday=weekday)
+        else:
+            return None
 
 
 class OpeningTimesBlock(blocks.StructBlock):
@@ -205,7 +215,7 @@ class OpeningTimesBlock(blocks.StructBlock):
 
     @staticmethod
     def time_keyfunc(opening_time):
-        if opening_time.get('specific'):
+        if opening_time.block.single_date(opening_time):
             return opening_time
         else:
             return (
@@ -221,7 +231,27 @@ class OpeningTimesBlock(blocks.StructBlock):
     def get_context(self, value, parent_context=None):
         ctx = super().get_context(value, parent_context=parent_context)
         ctx['times'] = self.group_times(value.get('times'))
+        ctx['today'] = self.opening_today(value)
         return ctx
+
+    @staticmethod
+    def get_time_for_date(value, date):
+        if value:
+            times = value.get('times')
+            specific_times = utils.first_true(times, lambda x: x.get('date') == date)
+            times = specific_times or utils.first_true(times, lambda x: x.get('weekday') == date.weekday())
+            if times:
+                return dict(times)
+        return None
+
+    @classmethod
+    def opening_today(cls, value, cache_key=None):
+        today = now().date()
+        partialed_getter = partial(cls.get_time_for_date, value, today)
+        if cache_key:
+            return cache.get_or_set(cache_key, partialed_getter, 60*60*24)
+        else:
+            return partialed_getter()
 
 
 class LocationBlock(blocks.StructBlock):
