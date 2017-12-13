@@ -49,3 +49,12 @@ def humanize_date_range(start, end):
 @register.filter
 def bleachclean(value):
     return bleach.clean(value, strip=True)
+
+
+@register.simple_tag
+def block_method(block_value, method_name):
+    method = getattr(block_value.block, method_name)
+    if method:
+        return method(block_value)
+    else:
+        return None
