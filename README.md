@@ -5,7 +5,7 @@ For various reusable wagtail blocks and models and other common niceties.
 ### Installing
 
 ```
-$ pip install https://github.com/regulusweb/wagtail-extensions/archive/master.zip
+$ pip install regulus-wagtail-extensions
 ```
 
 Add the following to your `INSTALLED_APPS`:
