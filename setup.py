@@ -13,20 +13,19 @@ test_requires = [
 ]
 
 setup(
-    name='wagtail-extensions',
-    version='0.0.1',
+    name='regulus-wagtail-extensions',
+    version='0.1',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
     description='A few useful extensions for Wagtail',
-    url='https://regulusweb.com/',
-    author='Craig Loftus',
-    author_email='craig@regulusweb.com',
+    url='https://github.com/regulusweb/wagtail-extensions',
+    author='Regulus Ltd',
+    author_email='reg@regulusweb.com',
     install_requires=[
         'django-phonenumber-field',
         'dateutils',
         'wagtailgeowidget',
-
         # contact
         'django-honeypot>=0.6.0',
         'django-crispy-forms>=1.6.1',
