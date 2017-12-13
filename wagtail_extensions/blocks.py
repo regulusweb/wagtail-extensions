@@ -219,6 +219,7 @@ class OpeningTimesBlock(blocks.StructBlock):
             return opening_time
         else:
             return (
+                opening_time.get('closed'),
                 opening_time.get('start'),
                 opening_time.get('end'),
             )

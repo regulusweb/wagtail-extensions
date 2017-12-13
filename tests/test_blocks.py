@@ -182,9 +182,9 @@ def test_openingtimes_block_time_keyfunc_specific():
 
 
 def test_openingtimes_block_time_keyfunc_non_specific():
-    value = OpeningTimeBlock().to_python({'start': '5:00', 'end': '10:00'})
+    value = OpeningTimeBlock().to_python({'closed': False, 'start': '5:00', 'end': '10:00'})
     out = OpeningTimesBlock.time_keyfunc(value)
-    assert out == (datetime.time(5), datetime.time(10))
+    assert out == (False, datetime.time(5), datetime.time(10))
 
 
 @patch('wagtail_extensions.blocks.groupby')
