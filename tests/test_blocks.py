@@ -55,41 +55,29 @@ def test_link_block_clean_both_page_and_url():
 
 
 @pytest.mark.django_db
-def test_link_block_to_python_page():
+def test_link_block_get_context_page():
     link = LinkBlock()
-    value = link.to_python({'page': 2})
-    assert value['url'] == "/"
+    ctx = link.get_context({'page': Page.objects.get(pk=2)})
+    assert ctx['url'] == "/"
 
 
-def test_link_block_to_python_absolute_url():
+def test_link_block_get_context_absolute_url():
     link = LinkBlock()
-    value = link.to_python({'absolute_url': 'http://test.com/'})
-    assert value['url'] == "http://test.com/"
+    ctx = link.get_context({'absolute_url': 'http://test.com/'})
+    assert ctx['url'] == "http://test.com/"
 
 
 @pytest.mark.django_db
-def test_link_block_to_python_page_and_absolute_url():
+def test_link_block_get_context_page_and_absolute_url():
     link = LinkBlock()
-    value = link.to_python({'page': 2, 'absolute_url': 'http://test.com/'})
-    assert value['url'] == "/"
-
-
-def test_link_block_to_python_nothing():
-    link = LinkBlock()
-    value = link.to_python({})
-    assert 'url' not in value
+    ctx = link.get_context({'page': Page.objects.get(pk=2), 'absolute_url': 'http://test.com/'})
+    assert ctx['url'] == "/"
 
 
 def test_link_block_get_context_no_url():
     link = LinkBlock()
     ctx = link.get_context({})
-    assert ctx['has_url'] == False
-
-
-def test_link_block_get_context_with_url():
-    link = LinkBlock()
-    ctx = link.get_context({'url': 'some url'})
-    assert ctx['has_url'] == True
+    assert ctx['url'] == None
 
 
 @freeze_time("2017-01-01")

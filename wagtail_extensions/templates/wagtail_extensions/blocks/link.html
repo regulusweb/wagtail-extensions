@@ -1,9 +1,9 @@
-{% if has_url %}
-    <a href="{{ value.url }}">
+{% if url %}
+    <a href="{{ url }}">
         {% if value.page %}
             {% firstof value.text value.page.title %}
         {% else %}
-            {% firstof value.text value.url %}
+            {% firstof value.text url %}
         {% endif %}
     </a>
 {% endif %}
