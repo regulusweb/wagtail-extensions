@@ -51,17 +51,15 @@ class LinkBlock(blocks.StructBlock):
 
         return super().clean(value)
 
-    def to_python(self, value):
-        value = super().to_python(value)
-        if value.get('page'):
-            value['url'] = value['page'].url
-        elif value.get('absolute_url'):
-            value['url'] = value.get('absolute_url')
-        return value
-
     def get_context(self, value, parent_context=None):
         ctx = super().get_context(value, parent_context=parent_context)
-        ctx['has_url'] = 'url' in value
+        if value.get('page'):
+            url = value['page'].url
+        elif value.get('absolute_url'):
+            url = value.get('absolute_url')
+        else:
+            url = None
+        ctx['url'] = url
         return ctx
 
 
