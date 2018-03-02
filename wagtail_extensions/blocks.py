@@ -14,6 +14,7 @@ from django.utils.timezone import now
 from phonenumber_field import phonenumber
 from phonenumber_field.formfields import PhoneNumberField
 from wagtail.wagtailcore import blocks
+from wagtail.wagtaildocs.blocks import DocumentChooserBlock
 from wagtail.wagtailimages.blocks import ImageChooserBlock
 from wagtailgeowidget.blocks import GeoBlock
 
@@ -33,34 +34,35 @@ class StrippedListBlock(blocks.ListBlock):
 
 
 class LinkBlock(blocks.StructBlock):
+
     text = blocks.CharBlock(required=False)
-    page = blocks.PageChooserBlock(required=False)
-    absolute_url = blocks.CharBlock(label="Url", required=False)
-
-    class Meta:
-        template = 'wagtail_extensions/blocks/link.html'
-
-    def clean(self, value):
-        if value.get('page') and value.get('absolute_url'):
-            errors = {
-                'page': ErrorList([
-                    ValidationError('Either a page or url must be defined'),
-                ]),
-            }
-            raise ValidationError('There is a problem with this link', params=errors)
-
-        return super().clean(value)
+    link = blocks.StreamBlock([
+        ('page', blocks.PageChooserBlock()),
+        ('document', DocumentChooserBlock()),
+        ('url', blocks.CharBlock(label="URL (absolute or relative)"))
+    ], min_num=1, max_num=1)
 
     def get_context(self, value, parent_context=None):
         ctx = super().get_context(value, parent_context=parent_context)
-        if value.get('page'):
-            url = value['page'].url
-        elif value.get('absolute_url'):
-            url = value.get('absolute_url')
+
+        link_item = value['link'][0]
+        if link_item.block_type in ('page', 'document'):
+            link_url = link_item.value.url
+            link_text = link_item.value.title
         else:
-            url = None
-        ctx['url'] = url
+            link_url = link_item.value      # raw url
+            link_text = link_item.value
+
+        # If text is set then it takes precedence
+        if value.get('text') is not None:
+            link_text = value['text']
+        ctx['link_url'] = link_url
+        ctx['link_text'] = link_text
         return ctx
+
+
+    class Meta:
+        template = 'wagtail_extensions/blocks/link.html'
 
 
 class CarouselItemBlock(blocks.StructBlock):

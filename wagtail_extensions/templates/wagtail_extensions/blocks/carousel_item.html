@@ -2,11 +2,13 @@
 
 {% image item.image fill-1600x600 as item_image %}
 <div class="carousel-item {% if forloop.first %}active{% endif %}">
-    <a {% if item.link.url %}href="{{ item.link.url }}"{% endif %} class="item-inner" style="background-image: url({{ item_image.url }});">
+    {% with link=item.link.link.0 %}
+    <a {% if link %}href="{% firstof link.value.url link.value %}"{% endif %} class="item-inner" style="background-image: url({{ item_image.url }});">
         {% if item.caption %}
         <div class="carousel-caption">
             <h3>{{ item.caption }}</h3>
         </div>
         {% endif %}
     </a>
+    {% endwith %}
 </div>
