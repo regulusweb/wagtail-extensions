@@ -1,14 +1,26 @@
 import datetime
+import pytest
 from unittest.mock import patch
 
 from django.core.exceptions import ValidationError
 from freezegun import freeze_time
 from phonenumber_field.phonenumber import PhoneNumber
-import pytest
+
 from wagtail.wagtailcore.models import Page
 from wagtail_extensions.blocks import (DepartmentBlock, LinkBlock,
                                        OpeningTimeBlock, OpeningTimesBlock,
                                        PhoneBlock)
+
+
+@pytest.mark.django_db
+@pytest.fixture
+def page():
+    # Homepage is created by Wagtail's initial migrations
+    # But let's create our own child page for testing with.
+    homepage = Page.objects.get(url_path='/home/')
+    page = Page(title='A test page', slug="test")
+    homepage.add_child(instance=page)
+    return page
 
 
 def test_department_block_clean_invalid():
@@ -33,51 +45,45 @@ def test_department_block_to_python_strip_empty_phonenumbers():
     assert value['phones'] == ['+447528712345']
 
 
-@pytest.mark.django_db
-def test_link_block_clean_just_page():
-    link = LinkBlock()
-    link.clean({'text': 'A link', 'page': 1})
+def test_link_block_with_url():
+    block = LinkBlock()
+    value = block.to_python({
+        'link': [{'type': 'url', 'value': '/hello/'}]
+    })
+    html = block.render(value)
+    assert html.strip() == '<a href="/hello/">/hello/</a>'
 
 
-def test_link_block_clean_just_url():
-    link = LinkBlock()
-    link.clean({'text': 'A link', 'absolute_url': 'https://foo.com'})
-
-
-def test_link_block_clean_both_page_and_url():
-    link = LinkBlock()
-    with pytest.raises(ValidationError):
-        link.clean({
-            'text': 'A link',
-            'page': '1',
-            'absolute_url': 'https://foo.com',
-        })
-
-
-@pytest.mark.django_db
-def test_link_block_get_context_page():
-    link = LinkBlock()
-    ctx = link.get_context({'page': Page.objects.get(pk=2)})
-    assert ctx['url'] == "/"
-
-
-def test_link_block_get_context_absolute_url():
-    link = LinkBlock()
-    ctx = link.get_context({'absolute_url': 'http://test.com/'})
-    assert ctx['url'] == "http://test.com/"
+def test_link_block_with_url_and_text():
+    block = LinkBlock()
+    value = block.to_python({
+        'text': 'Hello World',
+        'link': [{'type': 'url', 'value': '/hello/'}]
+    })
+    html = block.render(value)
+    assert html.strip() == '<a href="/hello/">Hello World</a>'
 
 
 @pytest.mark.django_db
-def test_link_block_get_context_page_and_absolute_url():
-    link = LinkBlock()
-    ctx = link.get_context({'page': Page.objects.get(pk=2), 'absolute_url': 'http://test.com/'})
-    assert ctx['url'] == "/"
+def test_link_block_with_page(page):
+    block = LinkBlock()
+    value = block.to_python({
+        'link': [{'type': 'page', 'value': page.pk}]
+    })
+
+    html = block.render(value)
+    assert html.strip() == '<a href="{}">{}</a>'.format(page.url, page.title)
 
 
-def test_link_block_get_context_no_url():
-    link = LinkBlock()
-    ctx = link.get_context({})
-    assert ctx['url'] == None
+@pytest.mark.django_db
+def test_link_block_with_page_and_text(page):
+    block = LinkBlock()
+    value = block.to_python({
+        'text': 'Hello World',
+        'link': [{'type': 'page', 'value': page.pk}]
+    })
+    html = block.render(value)
+    assert html.strip() == '<a href="{}">Hello World</a>'.format(page.url)
 
 
 @freeze_time("2017-01-01")
