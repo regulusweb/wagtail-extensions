@@ -36,11 +36,25 @@ class StrippedListBlock(blocks.ListBlock):
 class LinkBlock(blocks.StructBlock):
 
     text = blocks.CharBlock(required=False)
+    # required=False because of https://github.com/wagtail/wagtail/issues/2665
     link = blocks.StreamBlock([
         ('page', blocks.PageChooserBlock()),
         ('document', DocumentChooserBlock()),
         ('url', blocks.CharBlock(label="URL (absolute or relative)"))
-    ], min_num=1, max_num=1)
+    ], max_num=1, required=False)
+
+    def clean(self, value):
+        result = super().clean(value)
+        if len(result['link']) == 0 and getattr(self.meta, 'required', True):
+            errors = {
+                'link': ErrorList([
+                    blocks.StreamBlockValidationError(non_block_errors=ErrorList([
+                        ValidationError('A page, document or URL must be defined.'),
+                    ]))
+                ]),
+            }
+            raise ValidationError('LinkBlock validation error', params=errors)
+        return result
 
     def get_context(self, value, parent_context=None):
         ctx = super().get_context(value, parent_context=parent_context)

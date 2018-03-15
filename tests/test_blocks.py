@@ -86,6 +86,26 @@ def test_link_block_with_page_and_text(page):
     assert html.strip() == '<a href="{}">Hello World</a>'.format(page.url)
 
 
+def test_link_block_clean_for_required():
+    block = LinkBlock()
+    value = block.to_python({
+        'text': 'Hello World',
+        'link': []      # This must not be empty if the field is required
+    })
+    with pytest.raises(ValidationError):
+        block.clean(value)
+
+
+def test_link_block_clean_for_not_required():
+    block = LinkBlock(required=False)
+    value = block.to_python({
+        'text': 'Hello World',
+        'link': []      # Can be empty if the field is not required
+    })
+    # This should not raise an exception
+    block.clean(value)
+
+
 @freeze_time("2017-01-01")
 def test_openingtime_block_clean_date_in_past():
     openingtime = OpeningTimeBlock()
