@@ -68,7 +68,7 @@ class LinkBlock(blocks.StructBlock):
             link_text = link_item.value
 
         # If text is set then it takes precedence
-        if value.get('text') is not None:
+        if value.get('text'):
             link_text = value['text']
         ctx['link_url'] = link_url
         ctx['link_text'] = link_text
