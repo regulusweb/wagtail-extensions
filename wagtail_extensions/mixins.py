@@ -4,8 +4,8 @@ from django.http import HttpResponseRedirect
 from django.utils.decorators import method_decorator
 
 from honeypot.decorators import check_honeypot
-from wagtail.wagtailadmin.edit_handlers import FieldPanel
-from wagtail.wagtailcore.models import Page
+from wagtail.admin.edit_handlers import FieldPanel
+from wagtail.core.models import Page
 
 from .forms import ContactForm
 

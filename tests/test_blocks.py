@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from freezegun import freeze_time
 from phonenumber_field.phonenumber import PhoneNumber
 
-from wagtail.wagtailcore.models import Page
+from wagtail.core.models import Page
 from wagtail_extensions.blocks import (DepartmentBlock, LinkBlock,
                                        OpeningTimeBlock, OpeningTimesBlock,
                                        PhoneBlock)

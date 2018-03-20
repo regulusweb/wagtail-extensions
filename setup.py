@@ -6,7 +6,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 test_requires = [
     'freezegun==0.3.9',
-    'wagtail==1.13',
+    'wagtail>=2.0,<2.1',
     'pytest==3.2.3',
     'pytest-django==3.1.2',
     'pytest-xdist==1.20.1',
@@ -14,7 +14,7 @@ test_requires = [
 
 setup(
     name='regulus-wagtail-extensions',
-    version='1.0.2',
+    version='2.0.0',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
@@ -24,6 +24,7 @@ setup(
     author_email='reg@regulusweb.com',
     python_requires='>=3.4',
     install_requires=[
+        'wagtail>=2.0'
         'django-phonenumber-field',
         'dateutils',
         'wagtailgeowidget',

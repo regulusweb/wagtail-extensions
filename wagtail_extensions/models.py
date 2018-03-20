@@ -3,10 +3,10 @@ from django.utils.timezone import now
 
 from wagtail.contrib.settings.models import BaseSetting
 from wagtail.contrib.table_block.blocks import TableBlock
-from wagtail.wagtailadmin.edit_handlers import StreamFieldPanel
-from wagtail.wagtailcore import blocks, fields
-from wagtail.wagtailcore.models import Page
-from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
+from wagtail.admin.edit_handlers import StreamFieldPanel
+from wagtail.core import blocks, fields
+from wagtail.core.models import Page
+from wagtail.images.edit_handlers import ImageChooserPanel
 
 from . import blocks as extension_blocks
 from . import utils

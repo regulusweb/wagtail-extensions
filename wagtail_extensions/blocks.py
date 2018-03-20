@@ -13,9 +13,9 @@ from django.forms.utils import ErrorList
 from django.utils.timezone import now
 from phonenumber_field import phonenumber
 from phonenumber_field.formfields import PhoneNumberField
-from wagtail.wagtailcore import blocks
-from wagtail.wagtaildocs.blocks import DocumentChooserBlock
-from wagtail.wagtailimages.blocks import ImageChooserBlock
+from wagtail.core import blocks
+from wagtail.documents.blocks import DocumentChooserBlock
+from wagtail.images.blocks import ImageChooserBlock
 from wagtailgeowidget.blocks import GeoBlock
 
 from . import app_settings

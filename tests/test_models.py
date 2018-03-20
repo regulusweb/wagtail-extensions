@@ -2,7 +2,7 @@ import datetime
 
 from freezegun import freeze_time
 import pytest
-from wagtail.wagtailcore.models import Site
+from wagtail.core.models import Site
 
 from tests.testproject.testapp.models import ContactDetailsTestSetting
 
