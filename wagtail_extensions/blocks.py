@@ -33,6 +33,31 @@ class StrippedListBlock(blocks.ListBlock):
         ]
 
 
+class LinkBlockStructValue(blocks.StructValue):
+
+    @property
+    def link_url(self):
+        link_item = self['link'][0]
+        if link_item.block_type in ('page', 'document'):
+            return link_item.value.url
+        else:
+            return link_item.value      # raw url
+
+    @property
+    def link_text(self):
+        link_item = self['link'][0]
+        if link_item.block_type in ('page', 'document'):
+            link_text = link_item.value.title
+        else:
+            link_text = link_item.value
+
+        # If text is set then it takes precedence
+        if self.get('text'):
+            link_text = self['text']
+
+        return link_text
+
+
 class LinkBlock(blocks.StructBlock):
 
     text = blocks.CharBlock(required=False)
@@ -56,27 +81,10 @@ class LinkBlock(blocks.StructBlock):
             raise ValidationError('LinkBlock validation error', params=errors)
         return result
 
-    def get_context(self, value, parent_context=None):
-        ctx = super().get_context(value, parent_context=parent_context)
-
-        link_item = value['link'][0]
-        if link_item.block_type in ('page', 'document'):
-            link_url = link_item.value.url
-            link_text = link_item.value.title
-        else:
-            link_url = link_item.value      # raw url
-            link_text = link_item.value
-
-        # If text is set then it takes precedence
-        if value.get('text'):
-            link_text = value['text']
-        ctx['link_url'] = link_url
-        ctx['link_text'] = link_text
-        return ctx
-
 
     class Meta:
         template = 'wagtail_extensions/blocks/link.html'
+        value_class = LinkBlockStructValue
 
 
 class CarouselItemBlock(blocks.StructBlock):

@@ -50,8 +50,9 @@ def test_link_block_with_url():
     value = block.to_python({
         'link': [{'type': 'url', 'value': '/hello/'}]
     })
-    html = block.render(value)
-    assert html.strip() == '<a href="/hello/">/hello/</a>'
+
+    assert value.link_url == '/hello/'
+    assert value.link_text == '/hello/'
 
 
 def test_link_block_with_url_and_text():
@@ -60,8 +61,18 @@ def test_link_block_with_url_and_text():
         'text': 'Hello World',
         'link': [{'type': 'url', 'value': '/hello/'}]
     })
-    html = block.render(value)
-    assert html.strip() == '<a href="/hello/">Hello World</a>'
+    assert value.link_url == '/hello/'
+    assert value.link_text == 'Hello World'
+
+
+def test_link_block_with_empty_string_text():
+    block = LinkBlock()
+    value = block.to_python({
+        'text': '',
+        'link': [{'type': 'url', 'value': '/hello/'}]
+    })
+    assert value.link_url == '/hello/'
+    assert value.link_text == '/hello/'
 
 
 @pytest.mark.django_db
@@ -71,8 +82,8 @@ def test_link_block_with_page(page):
         'link': [{'type': 'page', 'value': page.pk}]
     })
 
-    html = block.render(value)
-    assert html.strip() == '<a href="{}">{}</a>'.format(page.url, page.title)
+    assert value.link_url == page.url
+    assert value.link_text == page.title
 
 
 @pytest.mark.django_db
@@ -82,8 +93,8 @@ def test_link_block_with_page_and_text(page):
         'text': 'Hello World',
         'link': [{'type': 'page', 'value': page.pk}]
     })
-    html = block.render(value)
-    assert html.strip() == '<a href="{}">Hello World</a>'.format(page.url)
+    assert value.link_url == page.url
+    assert value.link_text == 'Hello World'
 
 
 def test_link_block_clean_for_required():
