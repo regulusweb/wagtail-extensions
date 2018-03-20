@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/regulusweb/wagtail-extensions.svg?branch=master)](https://travis-ci.org/regulusweb/wagtail-extensions)
+
 # Wagtail Extensions
 
 For various reusable wagtail blocks and models and other common niceties.

@@ -24,7 +24,7 @@ setup(
     author_email='reg@regulusweb.com',
     python_requires='>=3.4',
     install_requires=[
-        'wagtail>=2.0'
+        'wagtail>=2.0',
         'django-phonenumber-field',
         'dateutils',
         'wagtailgeowidget',
