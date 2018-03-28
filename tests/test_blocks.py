@@ -75,6 +75,16 @@ def test_link_block_with_empty_string_text():
     assert value.link_text == '/hello/'
 
 
+def test_link_block_with_missing_streamblock():
+    block = LinkBlock()
+    value = block.to_python({
+        'text': '',
+        'link': []
+    })
+    assert value.link_url == ''
+    assert value.link_text == ''
+
+
 @pytest.mark.django_db
 def test_link_block_with_page(page):
     block = LinkBlock()
