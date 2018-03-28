@@ -37,7 +37,11 @@ class LinkBlockStructValue(blocks.StructValue):
 
     @property
     def link_url(self):
-        link_item = self['link'][0]
+        try:
+            link_item = self['link'][0]
+        except IndexError:
+            return ''
+
         if link_item.block_type in ('page', 'document'):
             return link_item.value.url
         else:
@@ -45,7 +49,11 @@ class LinkBlockStructValue(blocks.StructValue):
 
     @property
     def link_text(self):
-        link_item = self['link'][0]
+        try:
+            link_item = self['link'][0]
+        except IndexError:
+            return ''
+
         if link_item.block_type in ('page', 'document'):
             link_text = link_item.value.title
         else:
