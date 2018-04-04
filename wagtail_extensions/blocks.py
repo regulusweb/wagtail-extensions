@@ -6,7 +6,7 @@ from itertools import groupby
 import math
 import uuid
 
-from dateutils import relativedelta
+from dateutil.relativedelta import relativedelta
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList

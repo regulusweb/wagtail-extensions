@@ -26,7 +26,7 @@ setup(
     install_requires=[
         'wagtail>=2.0',
         'django-phonenumber-field',
-        'dateutils',
+        'python-dateutil',
         'wagtailgeowidget',
         # contact
         'django-honeypot>=0.6.0',
