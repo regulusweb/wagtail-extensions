@@ -2,6 +2,7 @@ from urllib.parse import urlsplit
 
 from django.template import Library
 from django.template.defaultfilters import stringfilter
+from django.utils import timezone
 
 import bleach
 from wagtailgeowidget.app_settings import (
@@ -58,3 +59,15 @@ def block_method(block_value, method_name):
         return method(block_value)
     else:
         return None
+
+
+@register.inclusion_tag('wagtail_extensions/partials/track_form_submission.html')
+def track_form_submission(request):
+    submitted = request.session.get('enquiry_form_submitted', False)
+    if submitted:
+        # Remove the session variable
+        del request.session['enquiry_form_submitted']
+        if (timezone.now() - submitted).seconds < 60:
+            return {'enquiry_form_submitted': True}
+
+    return {'enquiry_form_submitted': False}

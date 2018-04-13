@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.db import models
 from django.http import HttpResponseRedirect
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 
 from honeypot.decorators import check_honeypot
@@ -12,6 +13,7 @@ from .models import ContactSubmission
 
 
 class ContactMixin(models.Model):
+
     form_class = ContactForm
     success_url = None
     store_submissions = True
@@ -50,6 +52,8 @@ class ContactMixin(models.Model):
                 success_message = self.get_success_message()
                 if success_message:
                     messages.add_message(request, messages.INFO, success_message)
+
+                request.session['enquiry_form_submitted'] = timezone.now()
                 # Redirect to the current page, to prevent resubmissions
                 return HttpResponseRedirect(self.get_success_url())
 
