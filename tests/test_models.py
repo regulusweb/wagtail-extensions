@@ -1,8 +1,12 @@
 import datetime
+import pytest
+from unittest import mock
 
 from freezegun import freeze_time
-import pytest
 from wagtail.core.models import Site
+from wagtail_extensions.forms import ContactForm
+from wagtail_extensions.mixins import ContactMixin
+from wagtail_extensions.models import ContactSubmission
 
 from tests.testproject.testapp.models import ContactDetailsTestSetting
 
@@ -162,3 +166,40 @@ def test_contact_details_primary_opening_today_no_location(contact_setting):
 def test_contact_details_get_opening_today_cache_key():
     out = ContactDetailsTestSetting.get_opening_today_cache_key()
     assert out == 'wagtail_extensions_opening_today_20171205'
+
+
+@pytest.mark.django_db
+def test_store_submission(rf):
+    form_data = {
+        'name': 'Alice',
+        'email': 'alice@example.com',
+        'message': 'Where is Bob?',
+        'foobar': '',   # Honeypot field
+    }
+    request = rf.post('/', form_data)
+    # Fake messages handler
+    request._messages = mock.MagicMock()
+    page = ContactMixin()
+    page.url = '/'
+    page.serve(request)
+    submission = ContactSubmission.objects.first()
+    del form_data['foobar']
+    assert submission.data == form_data
+
+
+@pytest.mark.django_db
+def test_disable_store_submission(rf):
+    form_data = {
+        'name': 'Alice',
+        'email': 'alice@example.com',
+        'message': 'Where is Bob?',
+        'foobar': '',   # Honeypot field
+    }
+    request = rf.post('/', form_data)
+    # Fake messages handler
+    request._messages = mock.MagicMock()
+    page = ContactMixin()
+    page.url = '/'
+    page.store_submissions = False
+    page.serve(request)
+    assert ContactSubmission.objects.count() == 0

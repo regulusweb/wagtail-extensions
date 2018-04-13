@@ -10,6 +10,7 @@ test_requires = [
     'pytest==3.2.3',
     'pytest-django==3.1.2',
     'pytest-xdist==1.20.1',
+    'psycopg2>=2.7.4',
 ]
 
 setup(
