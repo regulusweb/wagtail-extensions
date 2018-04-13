@@ -13,7 +13,7 @@ from .forms import ContactForm
 class ContactMixin(models.Model):
     form_class = ContactForm
     success_url = None
-    success_message = 'Thank you! We will get back to you as soon as possible.'
+    success_message = ''
 
     enquiry_email = models.EmailField(
         blank=True,
@@ -38,9 +38,9 @@ class ContactMixin(models.Model):
             if self.form.is_valid():
                 self.form.save(page=self)  # Save triggers an email
                 # Add a message to be displayed to the user
-                messages.add_message(
-                    request, messages.INFO,
-                    self.get_success_message())
+                message = self.get_success_message()
+                if message:
+                    messages.success(request, message)
                 # Redirect to the current page, to prevent resubmissions
                 return HttpResponseRedirect(self.get_success_url())
 

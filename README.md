@@ -52,3 +52,6 @@ Like so:
 And then within the form include the honeypot field:
 
 `{% render_honeypot_field %}`
+
+You can use the class variable `success_message` or override the `get_success_message` method to provide a success message. 
+`success_message` defaults to ''.
