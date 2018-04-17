@@ -32,7 +32,7 @@ class ContactForm(forms.Form):
         )
 
     def get_email_context(self):
-        ctx = self.cleaned_data
+        ctx = self.cleaned_data.copy()
         ctx['subject_prefix'] = settings.EMAIL_SUBJECT_PREFIX
         return ctx
 

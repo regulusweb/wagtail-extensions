@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.timezone import now
 
@@ -10,6 +11,20 @@ from wagtail.images.edit_handlers import ImageChooserPanel
 
 from . import blocks as extension_blocks
 from . import utils
+
+
+class ContactSubmission(models.Model):
+
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    data = JSONField()
+
+    def __str__(self):
+        if self.data.get('name'):
+            return 'Submission from {} on {}'.format(self.data['name'], self.date_submitted)
+        return 'Submission on {}'.format(self.date_submitted)
+
+    class Meta:
+        ordering = ['-date_submitted']
 
 
 class ContentPage(Page):

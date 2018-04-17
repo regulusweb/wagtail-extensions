@@ -8,11 +8,13 @@ from wagtail.admin.edit_handlers import FieldPanel
 from wagtail.core.models import Page
 
 from .forms import ContactForm
+from .models import ContactSubmission
 
 
 class ContactMixin(models.Model):
     form_class = ContactForm
     success_url = None
+    store_submissions = True
     success_message = 'Thank you! We will get back to you as soon as possible.'
 
     enquiry_email = models.EmailField(
@@ -31,16 +33,23 @@ class ContactMixin(models.Model):
     def get_form(self, request):
         return self.form_class(request.POST or None)
 
+    def store_submission(self, form_data):
+        # We do this here, instead of in the form, so that a project
+        # can make use of this regardless of which form it uses.
+        if self.store_submissions:
+            ContactSubmission.objects.create(data=form_data)
+
     @method_decorator(check_honeypot)
     def serve(self, request, *args, **kwargs):
         self.form = self.get_form(request)
         if request.method == 'POST':
             if self.form.is_valid():
                 self.form.save(page=self)  # Save triggers an email
+                self.store_submission(self.form.cleaned_data)
                 # Add a message to be displayed to the user
-                messages.add_message(
-                    request, messages.INFO,
-                    self.get_success_message())
+                success_message = self.get_success_message()
+                if success_message:
+                    messages.add_message(request, messages.INFO, success_message)
                 # Redirect to the current page, to prevent resubmissions
                 return HttpResponseRedirect(self.get_success_url())
 
