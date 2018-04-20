@@ -3,6 +3,7 @@ import pytest
 from unittest import mock
 
 from freezegun import freeze_time
+
 from wagtail.core.models import Site
 from wagtail_extensions.forms import ContactForm
 from wagtail_extensions.mixins import ContactMixin
@@ -179,6 +180,7 @@ def test_store_submission(rf):
     request = rf.post('/', form_data)
     # Fake messages handler
     request._messages = mock.MagicMock()
+    request.session = mock.MagicMock()
     page = ContactMixin()
     page.url = '/'
     page.serve(request)
@@ -198,8 +200,27 @@ def test_disable_store_submission(rf):
     request = rf.post('/', form_data)
     # Fake messages handler
     request._messages = mock.MagicMock()
+    request.session = mock.MagicMock()
     page = ContactMixin()
     page.url = '/'
     page.store_submissions = False
     page.serve(request)
     assert ContactSubmission.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_submission_saves_tracker_to_session(rf):
+    form_data = {
+        'name': 'Alice',
+        'email': 'alice@example.com',
+        'message': 'Where is Bob?',
+        'foobar': '',   # Honeypot field
+    }
+    request = rf.post('/', form_data)
+    request.session = {}
+    request._messages = mock.MagicMock()
+
+    page = ContactMixin()
+    page.url = '/'
+    page.serve(request)
+    assert 'enquiry_form_submitted' in request.session
