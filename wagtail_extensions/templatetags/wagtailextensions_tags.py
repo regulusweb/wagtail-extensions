@@ -69,11 +69,11 @@ def track_form_submission(request):
         # Remove the session variable
         del request.session['enquiry_form_submitted']
         try:
-            submitted_time = datetime.strptime(submitted, '%Y-%m-%d %H:%M')
+            submitted_time = datetime.strptime(submitted, '%Y-%m-%d %H:%M %z')
         except ValueError:
             return {'enquiry_form_submitted': False}
 
-        if (timezone.now() - timezone.make_aware(submitted_time)).seconds < 60:
+        if (timezone.now() - submitted_time).seconds < 60:
             return {'enquiry_form_submitted': True}
 
     return {'enquiry_form_submitted': False}

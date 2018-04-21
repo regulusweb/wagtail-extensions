@@ -20,7 +20,7 @@ def test_bleanclean_strips():
 def test_track_form_submission(rf):
     request = rf.get('/')
     request.session = {
-        'enquiry_form_submitted': timezone.now().strftime('%Y-%m-%d %H:%M')
+        'enquiry_form_submitted': timezone.now().strftime('%Y-%m-%d %H:%M %z')
     }
 
     ctx = track_form_submission(request)
@@ -33,7 +33,7 @@ def test_track_form_submission_expired(rf):
     request = rf.get('/')
     request.session = {
         # this was submitted too long ago to qualify
-        'enquiry_form_submitted': (timezone.now() - timedelta(seconds=3600)).strftime('%Y-%m-%d %H:%M')
+        'enquiry_form_submitted': (timezone.now() - timedelta(seconds=3600)).strftime('%Y-%m-%d %H:%M %z')
     }
 
     ctx = track_form_submission(request)
