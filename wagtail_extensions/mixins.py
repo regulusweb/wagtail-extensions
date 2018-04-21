@@ -53,7 +53,7 @@ class ContactMixin(models.Model):
                 if success_message:
                     messages.add_message(request, messages.INFO, success_message)
 
-                request.session['enquiry_form_submitted'] = timezone.now()
+                request.session['enquiry_form_submitted'] = timezone.now().strftime('%Y-%m-%d %H:%M')
                 # Redirect to the current page, to prevent resubmissions
                 return HttpResponseRedirect(self.get_success_url())
 
