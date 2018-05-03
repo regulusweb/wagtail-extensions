@@ -77,3 +77,25 @@ def track_form_submission(request):
             return {'enquiry_form_submitted': True}
 
     return {'enquiry_form_submitted': False}
+
+
+def page_menu_children(page, calling_page=None):
+    children = page.get_children().live().in_menu()
+    for child in children:
+        child.active = (calling_page.url.startswith(child.url) if calling_page else False)
+    return children
+
+
+@register.inclusion_tag('wagtail_extensions/partials/menu.html', takes_context=True)
+def menu(context, parent, calling_page=None):
+    menuitems = page_menu_children(parent, calling_page)
+
+    for menuitem in menuitems:
+        menuitem.children = page_menu_children(menuitem, calling_page)
+
+    return {
+        'calling_page': calling_page,
+        'menuitems': menuitems,
+        # required by the pageurl tag that we want to use within this template
+        'request': context['request'],
+    }
