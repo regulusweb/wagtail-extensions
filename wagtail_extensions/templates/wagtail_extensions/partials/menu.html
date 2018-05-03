@@ -1,8 +1,12 @@
 {% load wagtailcore_tags %}
-<ul class="navbar-nav nav-fill">
+<ul class="{% block list_classes %}navbar-nav{% endblock %}">
     {% for menuitem in menuitems %}
-        <li class="nav-item{% if menuitem.active %} active{% endif %}">
-            <a class="nav-link" href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
+        {% block item %}
+        <li class="{% block item_classes %}nav-item{% if menuitem.active %} active{% endif %}{% endblock %}">
+            {% block link %}
+            <a class="{% block link_classes %}nav-link{% endblock %}" href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
+            {% endblock %}
         </li>
+        {% endblock %}
     {% endfor %}
 </ul>
