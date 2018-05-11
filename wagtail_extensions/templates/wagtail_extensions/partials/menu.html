@@ -2,9 +2,18 @@
 <ul class="{% block list_classes %}navbar-nav{% endblock %}">
     {% for menuitem in menuitems %}
         {% block item %}
-        <li class="{% block item_classes %}nav-item{% if menuitem.active %} active{% endif %}{% endblock %}">
+        <li class="{% block item_classes %}nav-item{% if menuitem.active %} active{% endif %}{% if menuitem.children %} dropdown{% endif %}{% endblock %}">
             {% block link %}
-            <a class="{% block link_classes %}nav-link{% endblock %}" href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
+            <a class="{% block link_classes %}nav-link{% endblock %}{% if menuitem.children %} dropdown-toggle" data-toggle="dropdown{% endif %}" href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
+            {% endblock %}
+            {% block link_children %}
+                {% if menuitem.children %}
+                <div class="dropdown-menu" aria-labelledby="{{ menuitem.title }}">
+                    {% for child in menuitem.children %}
+                        <a class="dropdown-item{% if child.active %} active{% endif %}" href="{% pageurl child %}"><span class="fa fa-chevron-right"></span> {{ child.title }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
             {% endblock %}
         </li>
         {% endblock %}
