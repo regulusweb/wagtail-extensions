@@ -205,11 +205,11 @@ class OpeningTimeBlock(blocks.StructBlock):
     def to_python(self, value):
         value = super().to_python(value)
         weekday = value.get('weekday')
-        if weekday is not None:
+        if weekday is not None and weekday != '':
             value['weekday'] = int(weekday)
 
             label = value.get('label')
-            if value['weekday'] == self.PUBLIC and not label:
+            if value['weekday'] == self.PUBLIC and (label is None or label == ''):
                 value['label'] = self.PUBLIC_LABEL
         return value
 
