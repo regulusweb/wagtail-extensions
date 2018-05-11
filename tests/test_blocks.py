@@ -152,9 +152,9 @@ def test_openingtime_block_clean_valid():
     openingtime.clean({'start': '08:00', 'end': '20:00', 'date': '2017-01-01'})
 
 
-def test_openingtime_block_to_python_no_weekday():
+def test_openingtime_block_to_python_empty():
     openingtime = OpeningTimeBlock()
-    openingtime.to_python({})
+    openingtime.to_python({'label': '', 'date': None, 'closed': False, 'start': None, 'end': None, 'weekday': ''})
     # Pass without error
 
 
