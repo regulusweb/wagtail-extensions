@@ -10,7 +10,7 @@
                 {% if menuitem.children %}
                 <div class="dropdown-menu" aria-labelledby="{{ menuitem.title }}">
                     {% for child in menuitem.children %}
-                        <a class="dropdown-item{% if child.active %} active{% endif %}" href="{% pageurl child %}"><span class="fa fa-chevron-right"></span> {{ child.title }}</a>
+                        <a class="dropdown-item{% if child.active %} active{% endif %}" href="{% pageurl child %}">{{ child.title }}</a>
                     {% endfor %}
                 </div>
                 {% endif %}
