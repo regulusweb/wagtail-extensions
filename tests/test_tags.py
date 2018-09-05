@@ -1,5 +1,6 @@
 import pytest
 from datetime import timedelta
+from django.template import engines
 from django.utils import timezone
 
 from wagtail.core.models import Page
@@ -25,6 +26,19 @@ def page_tree():
     page_1.add_child(instance=page_1_1)
     pages = [page_1, page_2, page_3, page_4, page_1_1]
     return (root, pages)
+
+
+@pytest.fixture
+def render_template():
+    """
+    Returns a helper function that takes a template string, and returns the
+    rendered output.
+    """
+    template_engine = engines['django']
+    def func(template_string):
+        load_tags_string = '{% load wagtailextensions_tags %}'
+        return template_engine.from_string(load_tags_string + template_string).render()
+    return func
 
 
 def test_bleanclean_cleandata():
@@ -117,3 +131,21 @@ def test_menu_tag(page_tree, rf):
     assert out['menuitems'][1].slug == 'test_2'
     assert len(out['menuitems'][0].children) == 1
     assert out['menuitems'][0].children[0].slug == 'child_1'
+
+
+def test_metablock_with_no_modifications(render_template):
+    template_string = '{% metablock %}Hello{% endmetablock %}'
+    expected_output = 'Hello'
+    output = render_template(template_string)
+    assert output == expected_output
+
+
+def test_metablock_with_modifications(render_template):
+    template_string = """{% metablock %}
+        The world's "fastest"
+
+        <a href="">supercomputers</a> , period <-> Jane & John Doe.
+    {% endmetablock %}"""
+    expected_output = 'The world&#39;s &quot;fastest&quot; supercomputers, period &lt;-&gt; Jane &amp; John Doe.'
+    output = render_template(template_string)
+    assert output == expected_output

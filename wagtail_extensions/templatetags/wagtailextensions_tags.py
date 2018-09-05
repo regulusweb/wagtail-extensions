@@ -1,9 +1,9 @@
 from datetime import datetime
 from urllib.parse import urlsplit
 
-from django.template import Library
-from django.template.defaultfilters import stringfilter
-from django.utils import timezone
+from django.template import Library, Node
+from django.template.defaultfilters import escape, stringfilter
+from django.utils import html, timezone
 
 import bleach
 from wagtailgeowidget.app_settings import (
@@ -99,3 +99,32 @@ def menu(context, parent, calling_page=None):
         # required by the pageurl tag that we want to use within this template
         'request': context['request'],
     }
+
+
+@register.tag
+def metablock(parser, token):
+    """
+    Remove newlines, excessive whitespace, and HTML tags; and escape the
+    content of meta blocks.
+    """
+    nodelist = parser.parse(('endmetablock',))
+    parser.delete_first_token()
+    return MetaBlockNode(nodelist)
+
+
+class MetaBlockNode(Node):
+    def __init__(self, nodelist):
+        self.nodelist = nodelist
+
+    def render(self, context):
+        output = self.nodelist.render(context)
+        output = output.replace("\n", "")
+        output = " ".join(output.split()).replace(" ,", ",").replace(" .", ".")
+        output = html.strip_tags(unescape(output))
+        return escape(output)
+
+
+def unescape(text):
+    return text.replace(
+        "&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace(
+        "&quot;", '"').replace("&#39;", "'")
