@@ -15,7 +15,7 @@ test_requires = [
 
 setup(
     name='regulus-wagtail-extensions',
-    version='2.3.0',
+    version='2.4',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
@@ -27,6 +27,7 @@ setup(
     install_requires=[
         'wagtail>=2.0',
         'django-phonenumber-field',
+        'phonenumbers',
         'python-dateutil',
         'wagtailgeowidget',
         # contact
@@ -46,7 +47,6 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP',

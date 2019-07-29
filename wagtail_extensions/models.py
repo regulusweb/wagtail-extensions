@@ -59,7 +59,7 @@ class LinksSetting(BaseSetting):
 
     links = fields.StreamField([
         ('link', extension_blocks.LinkBlock()),
-    ])
+    ], null=True, blank=True)
 
     panels = (
         StreamFieldPanel('links'),
