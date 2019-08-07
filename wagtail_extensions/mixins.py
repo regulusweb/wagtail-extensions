@@ -12,6 +12,22 @@ from .forms import ContactForm
 from .models import ContactSubmission
 
 
+class SiteSingleton:
+
+    @classmethod
+    def can_create_at(cls, parent):
+        """
+        Allows only one instance of this class to be created on a site.
+        """
+        can_create = super().can_create_at(parent)
+        can_create_for_site = True
+        site = parent.get_site()
+
+        if site:
+            can_create_for_site = site.root_page.get_descendants().type(cls).exists()
+        return can_create and can_create_for_site
+
+
 class ContactMixin(models.Model):
 
     form_class = ContactForm
