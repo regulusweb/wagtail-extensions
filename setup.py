@@ -5,11 +5,11 @@ from setuptools import find_packages, setup
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 test_requires = [
-    'freezegun==0.3.12',
+    'freezegun>=0.3,<0.4',
     'wagtail>=2.0,<2.1',
-    'pytest==3.2.3',
-    'pytest-django==3.1.2',
-    'pytest-xdist==1.20.1',
+    'pytest>=5.0,<5.1',
+    'pytest-django>=3.5,<3.6',
+    'pytest-xdist>=1.29,<1.30',
     'psycopg2>=2.7.4',
 ]
 
@@ -23,7 +23,7 @@ setup(
     url='https://github.com/regulusweb/wagtail-extensions',
     author='Regulus Ltd',
     author_email='reg@regulusweb.com',
-    python_requires='>=3.4',
+    python_requires='>=3.5',
     install_requires=[
         'wagtail>=2.0',
         'django-phonenumber-field',
