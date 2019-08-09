@@ -24,7 +24,7 @@ class SiteSingleton:
         site = parent.get_site()
 
         if site:
-            can_create_for_site = site.root_page.get_descendants().type(cls).exists()
+            can_create_for_site = not site.root_page.get_descendants().type(cls).exists()
         return can_create and can_create_for_site
 
 
