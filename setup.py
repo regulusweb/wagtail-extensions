@@ -6,7 +6,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 test_requires = [
     'freezegun>=0.3,<0.4',
-    'wagtail>=2.0,<2.7',
+    'wagtail>=2.0,<2.8',
     'pytest>=5.0,<5.3',
     'pytest-django>=3.5,<3.8',
     'pytest-xdist>=1.29,<1.31',
