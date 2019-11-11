@@ -8,7 +8,7 @@ test_requires = [
     'freezegun>=0.3,<0.4',
     'wagtail>=2.0,<2.7',
     'pytest>=5.0,<5.3',
-    'pytest-django>=3.5,<3.6',
+    'pytest-django>=3.5,<3.8',
     'pytest-xdist>=1.29,<1.31',
     'psycopg2>=2.7.4',
 ]
