@@ -6,11 +6,9 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 test_requires = [
     'freezegun>=0.3,<0.4',
-    'wagtail>=2.0,<2.8',
-    'pytest>=5.0,<5.4',
-    'pytest-django>=3.5,<3.8',
+    'pytest-django>=3.8,<3.9',
     'pytest-xdist>=1.29,<1.32',
-    'psycopg2>=2.7.4',
+    'psycopg2-binary',
 ]
 
 setup(
@@ -25,14 +23,14 @@ setup(
     author_email='reg@regulusweb.com',
     python_requires='>=3.5',
     install_requires=[
-        'wagtail>=2.0',
+        'wagtail>=2.7,<2.9',
         'django-phonenumber-field',
         'phonenumbers',
         'python-dateutil',
         'wagtailgeowidget',
         # contact
         'django-honeypot>=0.6.0',
-        'django-crispy-forms>=1.6.1',
+        'django-crispy-forms>=1.7',
         'bleach>=2.0.0',
     ],
     extras_require={
@@ -41,14 +39,15 @@ setup(
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
-        'Framework :: Django :: 1.11',
+        'Framework :: Django :: 2.2',
+        'Framework :: Django :: 3.0',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
