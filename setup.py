@@ -9,7 +9,7 @@ test_requires = [
     'wagtail>=2.0,<2.8',
     'pytest>=5.0,<5.4',
     'pytest-django>=3.5,<3.8',
-    'pytest-xdist>=1.29,<1.31',
+    'pytest-xdist>=1.29,<1.32',
     'psycopg2>=2.7.4',
 ]
 
