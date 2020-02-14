@@ -1,5 +1,6 @@
 import pytest
 from datetime import timedelta
+from django import VERSION as DJANGO_VERSION
 from django.template import engines
 from django.utils import timezone
 
@@ -146,6 +147,10 @@ def test_metablock_with_modifications(render_template):
 
         <a href="">supercomputers</a> , period <-> Jane & John Doe.
     {% endmetablock %}"""
-    expected_output = 'The world&#39;s &quot;fastest&quot; supercomputers, period &lt;-&gt; Jane &amp; John Doe.'
+    if DJANGO_VERSION < (3, 0):
+        # See https://github.com/django/django/commit/8d76443aba863b75ad3b1392ca7e1d59bad84dc4
+        expected_output = 'The world&#39;s &quot;fastest&quot; supercomputers, period &lt;-&gt; Jane &amp; John Doe.'
+    else:
+        expected_output = 'The world&#x27;s &quot;fastest&quot; supercomputers, period &lt;-&gt; Jane &amp; John Doe.'
     output = render_template(template_string)
     assert output == expected_output
