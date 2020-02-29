@@ -7,9 +7,9 @@ from freezegun import freeze_time
 from phonenumber_field.phonenumber import PhoneNumber
 
 from wagtail.core.models import Page
-from wagtail_extensions.blocks import (DepartmentBlock, LinkBlock,
-                                       OpeningTimeBlock, OpeningTimesBlock,
-                                       PhoneBlock)
+from wagtail_extensions.blocks import (
+    DepartmentBlock, ImagesBlock, LinkBlock, OpeningTimeBlock, OpeningTimesBlock, PhoneBlock
+)
 
 
 @pytest.mark.django_db
@@ -312,3 +312,13 @@ def test_phone_block_to_python():
 def test_phone_block_to_python_empty():
     phone = PhoneBlock()
     assert phone.to_python('') == ''
+
+
+def test_images_block_get_context():
+    block = ImagesBlock()
+    assert block.get_context({'images': ['an image', 'another image', 'yet another image']})['column_width'] == 4
+
+
+def test_images_block_get_context_empty_list():
+    block = ImagesBlock()
+    assert block.get_context({})['column_width'] == 12
