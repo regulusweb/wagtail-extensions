@@ -321,5 +321,6 @@ class ImagesBlock(blocks.StructBlock):
 
     def get_context(self, value, parent_context=None):
         ctx = super().get_context(value, parent_context=parent_context)
-        ctx['column_width'] = math.floor(12 / len(value.get('images', [])))
+        images = value.get('images', None)
+        ctx['column_width'] = math.floor(12 / len(images)) if images else 12
         return ctx
