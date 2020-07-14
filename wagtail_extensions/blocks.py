@@ -43,7 +43,7 @@ class LinkBlockStructValue(blocks.StructValue):
             return ''
 
         if link_item.block_type in ('page', 'document'):
-            return link_item.value.url
+            return link_item.value.url if link_item.value else ''
         else:
             return link_item.value      # raw url
 
@@ -55,7 +55,7 @@ class LinkBlockStructValue(blocks.StructValue):
             return ''
 
         if link_item.block_type in ('page', 'document'):
-            link_text = link_item.value.title
+            link_text = link_item.value.title  if link_item.value else ''
         else:
             link_text = link_item.value
 
