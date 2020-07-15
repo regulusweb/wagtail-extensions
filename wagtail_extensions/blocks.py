@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
+from django.utils.functional import cached_property
 from django.utils.timezone import now
 from phonenumber_field import phonenumber
 from phonenumber_field.formfields import PhoneNumberField
@@ -35,7 +36,7 @@ class StrippedListBlock(blocks.ListBlock):
 
 class LinkBlockStructValue(blocks.StructValue):
 
-    @property
+    @cached_property
     def link_url(self):
         try:
             link_item = self['link'][0]
@@ -43,11 +44,11 @@ class LinkBlockStructValue(blocks.StructValue):
             return ''
 
         if link_item.block_type in ('page', 'document'):
-            return link_item.value.url
+            return link_item.value.url if link_item.value else ''
         else:
             return link_item.value      # raw url
 
-    @property
+    @cached_property
     def link_text(self):
         try:
             link_item = self['link'][0]
@@ -55,7 +56,7 @@ class LinkBlockStructValue(blocks.StructValue):
             return ''
 
         if link_item.block_type in ('page', 'document'):
-            link_text = link_item.value.title
+            link_text = link_item.value.title  if link_item.value else ''
         else:
             link_text = link_item.value
 

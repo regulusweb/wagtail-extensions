@@ -13,7 +13,7 @@ test_requires = [
 
 setup(
     name='regulus-wagtail-extensions',
-    version='2.5.3',
+    version='2.5.4',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',

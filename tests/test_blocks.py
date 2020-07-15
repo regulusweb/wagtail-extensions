@@ -97,6 +97,20 @@ def test_link_block_with_page(page):
 
 
 @pytest.mark.django_db
+def test_link_block_with_page_that_no_longer_exists(page):
+    """
+    If a page referenced by a PageChooserBlock has been deleted, the block value will be None.
+    """
+    block = LinkBlock()
+    value = block.to_python({
+        'link': [{'type': 'page', 'value': None}]
+    })
+
+    assert value.link_url == ''
+    assert value.link_text == ''
+
+
+@pytest.mark.django_db
 def test_link_block_with_page_and_text(page):
     block = LinkBlock()
     value = block.to_python({

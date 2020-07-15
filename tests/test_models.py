@@ -9,7 +9,7 @@ from wagtail_extensions.forms import ContactForm
 from wagtail_extensions.mixins import ContactMixin
 from wagtail_extensions.models import ContactSubmission
 
-from tests.testproject.testapp.models import ContactDetailsTestSetting
+from testproject.testapp.models import ContactDetailsTestSetting
 
 
 @pytest.mark.django_db

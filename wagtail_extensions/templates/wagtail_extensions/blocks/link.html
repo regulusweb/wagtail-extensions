@@ -1,1 +1,1 @@
-<a href="{{ value.link_url }}">{{ value.link_text }}</a>
+<a {% if value.link_url %}href="{{ value.link_url }}"{% endif %}>{{ value.link_text }}</a>
