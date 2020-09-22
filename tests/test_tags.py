@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from wagtail.core.models import Page
 from wagtail_extensions.templatetags.wagtailextensions_tags import (
-    bleachclean, page_menu_children, track_form_submission, menu)
+    page_menu_children, track_form_submission, menu)
 
 
 @pytest.mark.django_db
@@ -40,18 +40,6 @@ def render_template():
         load_tags_string = '{% load wagtailextensions_tags %}'
         return template_engine.from_string(load_tags_string + template_string).render()
     return func
-
-
-def test_bleanclean_cleandata():
-    cleaned = bleachclean('Hello')
-
-    assert cleaned == 'Hello'
-
-
-def test_bleanclean_strips():
-    cleaned = bleachclean('<script>evil</script>')
-
-    assert cleaned == 'evil'
 
 
 def test_track_form_submission(rf):
