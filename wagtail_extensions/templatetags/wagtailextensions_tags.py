@@ -48,11 +48,6 @@ def humanize_date_range(start, end):
     return "{} - {}".format(start.strftime(start_fmt), end.strftime(day_fmt))
 
 
-@register.filter
-def bleachclean(value):
-    return bleach.clean(value, strip=True)
-
-
 @register.simple_tag
 def block_method(block_value, method_name):
     method = getattr(block_value.block, method_name)
