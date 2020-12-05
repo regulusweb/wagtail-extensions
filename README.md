@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/regulusweb/wagtail-extensions.svg?branch=master)](https://travis-ci.org/regulusweb/wagtail-extensions)
+![Tests](https://github.com/regulusweb/wagtail-extensions/workflows/Tests/badge.svg)
 
 # Wagtail Extensions
 
