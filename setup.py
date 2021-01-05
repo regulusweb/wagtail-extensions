@@ -13,7 +13,7 @@ test_requires = [
 
 setup(
     name='regulus-wagtail-extensions',
-    version='2.5.5',
+    version='2.5.6',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
@@ -23,7 +23,7 @@ setup(
     author_email='reg@regulusweb.com',
     python_requires='>=3.7',
     install_requires=[
-        'wagtail>=2.7,<2.10',
+        'wagtail>=2.7,<2.12',
         'django-phonenumber-field',
         'phonenumbers',
         'python-dateutil',
