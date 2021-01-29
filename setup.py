@@ -7,7 +7,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 test_requires = [
     'freezegun>=0.3,<1.1',
     'pytest-django>=3.8,<4.2',
-    'pytest-xdist>=1.29,<2.2',
+    'pytest-xdist>=1.29,<2.3',
     'psycopg2-binary',
 ]
 
