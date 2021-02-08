@@ -23,7 +23,7 @@ setup(
     author_email='reg@regulusweb.com',
     python_requires='>=3.7',
     install_requires=[
-        'wagtail>=2.7,<2.12',
+        'wagtail>=2.7,<2.13',
         'django-phonenumber-field',
         'phonenumbers',
         'python-dateutil',
