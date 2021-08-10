@@ -2,6 +2,7 @@ import datetime
 import pytest
 from unittest import mock
 
+from django.core.cache import cache
 from freezegun import freeze_time
 
 from wagtail.core.models import Site
@@ -9,7 +10,7 @@ from wagtail_extensions.forms import ContactForm
 from wagtail_extensions.mixins import ContactMixin
 from wagtail_extensions.models import ContactSubmission
 
-from testproject.testapp.models import ContactDetailsTestSetting
+from testproject.testapp.models import ContactDetailsTestSetting, ContactPage
 
 
 @pytest.mark.django_db
@@ -113,6 +114,7 @@ def test_contact_details_primary_opening_today_none(contact_setting):
     contact_setting.refresh_from_db()
 
     assert contact_setting.primary_opening_today == None
+    cache.clear()
 
 
 @freeze_time("2017-06-06")
@@ -134,6 +136,7 @@ def test_contact_details_primary_opening_today_date(contact_setting):
     contact_setting.refresh_from_db()
 
     assert contact_setting.primary_opening_today['date'] == match
+    cache.clear()
 
 
 @freeze_time("2017-06-10")
@@ -156,6 +159,7 @@ def test_contact_details_primary_opening_today_weekday(contact_setting):
     contact_setting.refresh_from_db()
 
     assert contact_setting.primary_opening_today['weekday'] == match
+    cache.clear()
 
 
 @pytest.mark.django_db
@@ -181,8 +185,7 @@ def test_store_submission(rf):
     # Fake messages handler
     request._messages = mock.MagicMock()
     request.session = mock.MagicMock()
-    page = ContactMixin()
-    page.url = '/'
+    page = ContactPage()
     page.serve(request)
     submission = ContactSubmission.objects.first()
     del form_data['foobar']
@@ -201,8 +204,7 @@ def test_disable_store_submission(rf):
     # Fake messages handler
     request._messages = mock.MagicMock()
     request.session = mock.MagicMock()
-    page = ContactMixin()
-    page.url = '/'
+    page = ContactPage()
     page.store_submissions = False
     page.serve(request)
     assert ContactSubmission.objects.count() == 0
@@ -220,7 +222,6 @@ def test_submission_saves_tracker_to_session(rf):
     request.session = {}
     request._messages = mock.MagicMock()
 
-    page = ContactMixin()
-    page.url = '/'
+    page = ContactPage()
     page.serve(request)
     assert 'enquiry_form_submitted' in request.session

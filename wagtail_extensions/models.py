@@ -1,4 +1,3 @@
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.timezone import now
 
@@ -16,7 +15,7 @@ from . import utils
 class ContactSubmission(models.Model):
 
     date_submitted = models.DateTimeField(auto_now_add=True)
-    data = JSONField()
+    data = models.JSONField()
 
     def __str__(self):
         if self.data.get('name'):
