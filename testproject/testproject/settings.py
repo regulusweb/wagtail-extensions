@@ -129,7 +129,6 @@ WAGTAIL_SITE_NAME = "testproject"
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
 BASE_URL = 'http://example.com'
 
-HONEYPOT_FIELD_NAME = 'foobar'
 EMAIL_SUBJECT_PREFIX = 'Admin'
 MANAGERS = (
     ('admin', 'admin@localhost.com'),

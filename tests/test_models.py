@@ -179,7 +179,6 @@ def test_store_submission(rf):
         'name': 'Alice',
         'email': 'alice@example.com',
         'message': 'Where is Bob?',
-        'foobar': '',   # Honeypot field
     }
     request = rf.post('/', form_data)
     # Fake messages handler
@@ -188,7 +187,6 @@ def test_store_submission(rf):
     page = ContactPage()
     page.serve(request)
     submission = ContactSubmission.objects.first()
-    del form_data['foobar']
     assert submission.data == form_data
 
 
@@ -198,7 +196,6 @@ def test_disable_store_submission(rf):
         'name': 'Alice',
         'email': 'alice@example.com',
         'message': 'Where is Bob?',
-        'foobar': '',   # Honeypot field
     }
     request = rf.post('/', form_data)
     # Fake messages handler
@@ -216,7 +213,6 @@ def test_submission_saves_tracker_to_session(rf):
         'name': 'Alice',
         'email': 'alice@example.com',
         'message': 'Where is Bob?',
-        'foobar': '',   # Honeypot field
     }
     request = rf.post('/', form_data)
     request.session = {}

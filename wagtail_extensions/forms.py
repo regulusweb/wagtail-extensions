@@ -3,6 +3,8 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template import loader
 
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV3
 from crispy_forms.bootstrap import StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
@@ -22,6 +24,8 @@ class ContactForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if getattr(settings, "RECAPTCHA_PUBLIC_KEY", False):
+            self.fields['captcha'] = ReCaptchaField(widget=ReCaptchaV3)
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(

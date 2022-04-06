@@ -2,9 +2,7 @@ from django.contrib import messages
 from django.db import models
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-from django.utils.decorators import method_decorator
 
-from honeypot.decorators import check_honeypot
 from wagtail.admin.edit_handlers import FieldPanel
 from wagtail.core.models import Page
 
@@ -57,7 +55,6 @@ class ContactMixin(models.Model):
         if self.store_submissions:
             ContactSubmission.objects.create(data=form_data)
 
-    @method_decorator(check_honeypot)
     def serve(self, request, *args, **kwargs):
         self.form = self.get_form(request)
         if request.method == 'POST':

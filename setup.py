@@ -13,7 +13,7 @@ test_requires = [
 
 setup(
     name='regulus-wagtail-extensions',
-    version='2.6.0',
+    version='2.7.0',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
@@ -29,7 +29,7 @@ setup(
         'python-dateutil',
         'wagtailgeowidget',
         # contact
-        'django-honeypot>=1.0',
+        'django-recaptcha>=3.0,<3.1',
         'django-crispy-forms>=1.12',
         'bleach>=2.0.0',
     ],
